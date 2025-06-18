@@ -2,8 +2,6 @@
   "name": "xsight-app",
   "version": "1.0.0",
   "description": "AI Query Builder - Xsight Application with Firebase backend",
-  "main": "public/index.html",
-  "type": "module",
   "scripts": {
     "dev": "firebase emulators:start --only hosting",
     "serve": "firebase serve --only hosting",
