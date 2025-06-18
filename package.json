@@ -62,24 +62,4 @@
     "last 2 versions",
     "not dead"
   ]
-}{
-  "name": "xsight-app",
-  "version": "1.0.0",
-  "description": "AI Query Builder - Xsight Application",
-  "main": "public/index.html",
-  "scripts": {
-    "dev": "firebase serve",
-    "build": "echo 'Static site - no build needed'",
-    "deploy": "firebase deploy"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/YOUR_USERNAME/xsight-app.git"
-  },
-  "keywords": ["ai", "firebase", "javascript", "query-builder"],
-  "author": "Your Name",
-  "license": "MIT",
-  "devDependencies": {
-    "firebase-tools": "^13.0.0"
-  }
 }
