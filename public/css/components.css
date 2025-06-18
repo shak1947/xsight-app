@@ -1,1 +1,288 @@
 
+/* ===== SIDEBAR COMPONENTS ===== */
+.left-sidebar {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    width: 280px;
+    flex-shrink: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.sidebar-section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.sidebar-section-title svg {
+    width: 1.2em;
+    height: 1.2em;
+}
+
+.sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-list-item {
+    margin-bottom: 0.5rem;
+}
+
+.sidebar-list-item a,
+.sidebar-list-item button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #475569;
+    font-weight: 500;
+    background: transparent;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.sidebar-list-item a:hover,
+.sidebar-list-item button:hover {
+    background-color: #f0f4f8;
+    color: #1e40af;
+}
+
+.sidebar-list-item.active > a,
+.sidebar-list-item.active > button {
+    background-color: #e0f2f7;
+    color: #1e40af;
+    font-weight: 600;
+}
+
+/* ===== FORM COMPONENTS ===== */
+.form-section {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.create-item-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e2e8f0;
+    margin-top: 1rem;
+}
+
+.create-item-form input,
+.create-item-form textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.create-item-form input:focus,
+.create-item-form textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.create-item-form button {
+    padding: 0.75rem;
+    background-color: #10b981;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+
+.create-item-form button:hover {
+    background-color: #059669;
+}
+
+.create-new-agent-btn {
+    background-color: #10b981;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-left: 1rem;
+    transition: background-color 0.2s;
+}
+
+.create-new-agent-btn:hover {
+    background-color: #059669;
+}
+
+/* ===== INPUT COMPONENTS ===== */
+.textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 1rem;
+    resize: vertical;
+    transition: border-color 0.2s;
+    font-family: inherit;
+}
+
+.textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.char-hint {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin-top: 0.5rem;
+}
+
+/* ===== BUTTON COMPONENTS ===== */
+.analyze-btn {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.analyze-btn:hover {
+    background: linear-gradient(135deg, #059669, #047857);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+}
+
+/* ===== FILE UPLOAD COMPONENTS ===== */
+.file-upload-section {
+    border: 2px dashed #d1d5db;
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    background: #f9fafb;
+    margin-top: 1rem;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.file-upload-section:hover {
+    border-color: #3b82f6;
+    background: #eff6ff;
+}
+
+.file-upload-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+}
+
+.file-upload-controls input[type="file"] {
+    display: block;
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background-color: white;
+    font-size: 0.9rem;
+}
+
+.file-upload-controls button {
+    padding: 0.6rem 1.2rem;
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+
+.file-upload-controls button:hover {
+    background-color: #1e40af;
+}
+
+/* ===== PROGRESS COMPONENTS ===== */
+.upload-progress-container {
+    width: 100%;
+    background-color: #e2e8f0;
+    border-radius: 8px;
+    overflow: hidden;
+    height: 10px;
+}
+
+.upload-progress-bar {
+    height: 100%;
+    width: 0%;
+    background-color: #10b981;
+    transition: width 0.1s ease-out;
+    border-radius: 8px;
+}
+
+.upload-status-message {
+    font-size: 0.85rem;
+    color: #475569;
+}
+
+/* ===== RESULTS COMPONENTS ===== */
+.results {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin-top: 2rem;
+    display: none;
+}
+
+.results-header {
+    background: #10b981;
+    color: white;
+    padding: 1.5rem;
+}
+
+.results-content {
+    padding: 1.5rem;
+}
