@@ -1,1 +1,130 @@
+/* ===== BASE STYLES ===== */
+body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    background-color: #f1f5f9;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
 
+/* ===== APP HEADER ===== */
+.app-header {
+    background: linear-gradient(135deg, #1e40af, #3b82f6);
+    color: white;
+    padding: 1rem 2rem;
+    margin: 80px 0 0 0;
+    border-radius: 0 0 12px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+}
+
+.app-logo {
+    font-size: 1.2rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.logout-btn {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    margin-left: auto;
+    transition: background-color 0.2s;
+}
+
+.logout-btn:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+.delete-btn {
+    background-color: #ef4444 !important;
+}
+
+.delete-btn:hover {
+    background-color: #dc2626 !important;
+}
+
+/* ===== MAIN LAYOUT ===== */
+.main-app-layout {
+    display: flex;
+    flex-grow: 1;
+    padding: 2rem;
+    gap: 2rem;
+}
+
+.main-content-area {
+    flex-grow: 1;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    overflow-y: auto;
+}
+
+/* ===== PROTECTED CONTENT ===== */
+.protected-content {
+    display: flex;
+    flex-grow: 1;
+    display: none;
+    flex-direction: column;
+}
+
+.auth-message {
+    text-align: center;
+    margin-top: 5rem;
+    font-size: 1.2rem;
+    color: #64748b;
+}
+
+.auth-message a {
+    color: #3b82f6;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.auth-message a:hover {
+    text-decoration: underline;
+}
+
+/* ===== CONTENT VIEWS ===== */
+.content-view {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== PAGE TITLES ===== */
+.page-title {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.page-title h1 {
+    font-size: 2.5rem;
+    color: #1e40af;
+    margin-bottom: 0.5rem;
+}
+
+.page-title p {
+    color: #64748b;
+    font-size: 1.1rem;
+}
+
+/* ===== UTILITY CLASSES ===== */
+.hidden { display: none !important; }
+.loading { opacity: 0.6; pointer-events: none; }
+.success { color: #10b981 !important; }
+.error { color: #ef4444 !important; }
