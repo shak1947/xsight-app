@@ -17,34 +17,11 @@ export class AgentsManager {
         // DOM elements
         this.agentsList = document.getElementById('agentsList');
         this.agentsInProjectList = document.getElementById('agentsInProjectList');
-        this.agentForm = document.getElementById('agentForm');
-        this.agentFormTitle = document.getElementById('agentFormTitle');
-        this.agentFormNameInput = document.getElementById('agentFormName');
-        this.agentFormDescriptionInput = document.getElementById('agentFormDescription');
-        this.agentFormInitialInstructionsInput = document.getElementById('agentFormInitialInstructions');
-        this.gptFormSelectionOptionsDiv = document.getElementById('gptFormSelectionOptions');
-        this.agentFormSubmitBtn = document.getElementById('agentFormSubmitBtn');
-        this.agentFormCancelBtn = document.getElementById('agentFormCancelBtn');
         
         this.init();
     }
     
     init() {
-        // Set up form submission
-        if (this.agentForm) {
-            this.agentForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                this.saveAgent();
-            });
-        }
-        
-        // Set up cancel button
-        if (this.agentFormCancelBtn) {
-            this.agentFormCancelBtn.addEventListener('click', () => {
-                this.cancelAgentForm();
-            });
-        }
-        
         // Listen for auth changes
         this.authManager.onAuthChange((user) => {
             if (user) {
@@ -111,8 +88,9 @@ export class AgentsManager {
             this.renderAgentFormGptOptions();
         }, (error) => {
             console.error("Error fetching GPT models:", error);
-            if (this.gptFormSelectionOptionsDiv) {
-                this.gptFormSelectionOptionsDiv.innerHTML = '<p style="color:red; font-size:0.85rem;">Failed to load GPT options.</p>';
+            const gptOptionsDiv = document.getElementById('gptFormSelectionOptions');
+            if (gptOptionsDiv) {
+                gptOptionsDiv.innerHTML = '<p style="color:red; font-size:0.85rem;">Failed to load GPT options.</p>';
             }
         });
     }
@@ -151,6 +129,42 @@ export class AgentsManager {
             this.agentsList.innerHTML = '<li class="sidebar-list-item" style="font-size:0.9rem; color: #64748b;">Select a project.</li>';
             return;
         }
+        
+        const agentsInCurrentProject = this.agents.filter(agent => agent.projectId === selectedProjectId);
+        
+        if (agentsInCurrentProject.length === 0) {
+            this.agentsList.innerHTML = '<li class="sidebar-list-item" style="font-size:0.9rem; color: #64748b;">No agents in this project.</li>';
+            return;
+        }
+        
+        agentsInCurrentProject.forEach(agent => {
+            const li = document.createElement('li');
+            li.className = 'sidebar-list-item sidebar-sub-list-item';
+            
+            if (this.selectedAgentId === agent.id) {
+                li.classList.add('active');
+            }
+            
+            const link = document.createElement('a');
+            link.href = "#";
+            link.innerHTML = `🤖 ${agent.name}`;
+            link.onclick = (e) => {
+                e.preventDefault();
+                this.selectAgent(agent.id);
+            };
+            
+            li.appendChild(link);
+            this.agentsList.appendChild(li);
+        });
+    }
+    
+    renderAgentsInProject() {
+        if (!this.agentsInProjectList) return;
+        
+        const selectedProjectId = this.projectsManager.getSelectedProjectId();
+        this.agentsInProjectList.innerHTML = '';
+        
+        if (!selectedProjectId) return;
         
         const agentsInCurrentProject = this.agents.filter(agent => agent.projectId === selectedProjectId);
         
@@ -200,22 +214,31 @@ export class AgentsManager {
         }
         
         this.currentAgentBeingEditedId = null;
-        
-        if (this.agentFormTitle) {
-            this.agentFormTitle.textContent = "➕ Create New Agent";
-        }
-        if (this.agentFormSubmitBtn) {
-            this.agentFormSubmitBtn.textContent = "Create Agent";
-            this.agentFormSubmitBtn.style.backgroundColor = '#10b981';
-        }
-        
-        // Clear form
-        if (this.agentForm) {
-            clearForm(this.agentForm);
-        }
-        
         this.renderAgentFormGptOptions();
         this.uiManager.showAgentForm();
+        
+        // Set form title and button text
+        setTimeout(() => {
+            const agentFormTitle = document.getElementById('agentFormTitle');
+            const agentFormSubmitBtn = document.getElementById('agentFormSubmitBtn');
+            
+            if (agentFormTitle) {
+                agentFormTitle.textContent = "➕ Create New Agent";
+            }
+            if (agentFormSubmitBtn) {
+                agentFormSubmitBtn.textContent = "Create Agent";
+                agentFormSubmitBtn.style.backgroundColor = '#10b981';
+            }
+            
+            // Clear form
+            const agentForm = document.getElementById('agentForm');
+            if (agentForm) {
+                clearForm(agentForm);
+            }
+            
+            // Set up form event listeners
+            this.setupAgentFormListeners();
+        }, 100);
     }
     
     showAgentFormForEdit() {
@@ -228,37 +251,66 @@ export class AgentsManager {
         }
         
         this.currentAgentBeingEditedId = targetAgentId;
-        
-        if (this.agentFormTitle) {
-            this.agentFormTitle.textContent = `✏️ Edit Agent: ${agent.name}`;
-        }
-        if (this.agentFormSubmitBtn) {
-            this.agentFormSubmitBtn.textContent = "Update Agent";
-            this.agentFormSubmitBtn.style.backgroundColor = '#3b82f6';
-        }
-        
-        // Populate form with existing data
-        if (this.agentFormNameInput) {
-            this.agentFormNameInput.value = agent.name || '';
-        }
-        if (this.agentFormDescriptionInput) {
-            this.agentFormDescriptionInput.value = agent.description || '';
-        }
-        if (this.agentFormInitialInstructionsInput) {
-            this.agentFormInitialInstructionsInput.value = agent.initialInstructions || '';
-        }
-        
-        this.renderAgentFormGptOptions(agent.selectedGpts || []);
         this.uiManager.showAgentForm();
+        
+        // Wait for form to render, then populate it
+        setTimeout(() => {
+            const agentFormTitle = document.getElementById('agentFormTitle');
+            const agentFormSubmitBtn = document.getElementById('agentFormSubmitBtn');
+            const agentFormNameInput = document.getElementById('agentFormName');
+            const agentFormDescriptionInput = document.getElementById('agentFormDescription');
+            const agentFormInitialInstructionsInput = document.getElementById('agentFormInitialInstructions');
+            
+            if (agentFormTitle) {
+                agentFormTitle.textContent = `✏️ Edit Agent: ${agent.name}`;
+            }
+            if (agentFormSubmitBtn) {
+                agentFormSubmitBtn.textContent = "Update Agent";
+                agentFormSubmitBtn.style.backgroundColor = '#3b82f6';
+            }
+            
+            // Populate form with existing data
+            if (agentFormNameInput) {
+                agentFormNameInput.value = agent.name || '';
+            }
+            if (agentFormDescriptionInput) {
+                agentFormDescriptionInput.value = agent.description || '';
+            }
+            if (agentFormInitialInstructionsInput) {
+                agentFormInitialInstructionsInput.value = agent.initialInstructions || '';
+            }
+            
+            this.renderAgentFormGptOptions(agent.selectedGpts || []);
+            this.setupAgentFormListeners();
+        }, 100);
+    }
+    
+    setupAgentFormListeners() {
+        const agentForm = document.getElementById('agentForm');
+        const agentFormCancelBtn = document.getElementById('agentFormCancelBtn');
+        
+        if (agentForm) {
+            agentForm.onsubmit = (e) => {
+                e.preventDefault();
+                this.saveAgent();
+            };
+        }
+        
+        if (agentFormCancelBtn) {
+            agentFormCancelBtn.onclick = () => {
+                this.cancelAgentForm();
+            };
+        }
     }
     
     renderAgentFormGptOptions(selectedGpts = []) {
-        if (!this.gptFormSelectionOptionsDiv) return;
+        const gptFormSelectionOptionsDiv = document.getElementById('gptFormSelectionOptions');
+        if (!gptFormSelectionOptionsDiv) return;
         
-        this.gptFormSelectionOptionsDiv.innerHTML = '';
+        gptFormSelectionOptionsDiv.innerHTML = '';
         
         if (this.availableGptModels.length === 0) {
-            this.gptFormSelectionOptionsDiv.innerHTML = '<p style="color:#64748b; font-size:0.85rem;">Loading GPT options...</p>';
+            gptFormSelectionOptionsDiv.innerHTML = '<p style="color:#64748b; font-size:0.85rem;">Loading GPT options...</p>';
             return;
         }
         
@@ -277,7 +329,7 @@ export class AgentsManager {
                 </label>
             `;
             
-            this.gptFormSelectionOptionsDiv.appendChild(checkboxDiv);
+            gptFormSelectionOptionsDiv.appendChild(checkboxDiv);
         });
     }
     
@@ -291,9 +343,14 @@ export class AgentsManager {
         }
         
         // Get form data
-        const name = this.agentFormNameInput?.value.trim();
-        const description = this.agentFormDescriptionInput?.value.trim();
-        const initialInstructions = this.agentFormInitialInstructionsInput?.value.trim();
+        const agentFormNameInput = document.getElementById('agentFormName');
+        const agentFormDescriptionInput = document.getElementById('agentFormDescription');
+        const agentFormInitialInstructionsInput = document.getElementById('agentFormInitialInstructions');
+        const gptFormSelectionOptionsDiv = document.getElementById('gptFormSelectionOptions');
+        
+        const name = agentFormNameInput?.value.trim();
+        const description = agentFormDescriptionInput?.value.trim();
+        const initialInstructions = agentFormInitialInstructionsInput?.value.trim();
         
         if (!name) {
             showMessage(document.getElementById('errorMessage'), "Agent name is required.", false);
@@ -302,7 +359,7 @@ export class AgentsManager {
         
         // Get selected GPT models
         const selectedGpts = [];
-        const checkboxes = this.gptFormSelectionOptionsDiv?.querySelectorAll('input[name="selectedGpts"]:checked');
+        const checkboxes = gptFormSelectionOptionsDiv?.querySelectorAll('input[name="selectedGpts"]:checked');
         if (checkboxes) {
             checkboxes.forEach(checkbox => selectedGpts.push(checkbox.value));
         }
@@ -433,40 +490,4 @@ window.selectAgent = function(agentId) {
     if (window.agentsManager) {
         window.agentsManager.selectAgent(agentId);
     }
-};entsInCurrentProject.length === 0) {
-            this.agentsList.innerHTML = '<li class="sidebar-list-item" style="font-size:0.9rem; color: #64748b;">No agents in this project.</li>';
-            return;
-        }
-        
-        agentsInCurrentProject.forEach(agent => {
-            const li = document.createElement('li');
-            li.className = 'sidebar-list-item sidebar-sub-list-item';
-            
-            if (this.selectedAgentId === agent.id) {
-                li.classList.add('active');
-            }
-            
-            const link = document.createElement('a');
-            link.href = "#";
-            link.innerHTML = `🤖 ${agent.name}`;
-            link.onclick = (e) => {
-                e.preventDefault();
-                this.selectAgent(agent.id);
-            };
-            
-            li.appendChild(link);
-            this.agentsList.appendChild(li);
-        });
-    }
-    
-    renderAgentsInProject() {
-        if (!this.agentsInProjectList) return;
-        
-        const selectedProjectId = this.projectsManager.getSelectedProjectId();
-        this.agentsInProjectList.innerHTML = '';
-        
-        if (!selectedProjectId) return;
-        
-        const agentsInCurrentProject = this.agents.filter(agent => agent.projectId === selectedProjectId);
-        
-        if (ag
+};
