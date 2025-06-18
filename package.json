@@ -1,7 +1,17 @@
+
 {
-  "name": "xsight-app",
-  "version": "1.0.0",
-  "scripts": {
-    "build": "echo 'No build required - static site'"
+  "hosting": {
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
   }
 }
