@@ -1,17 +1,38 @@
-
 {
-  "hosting": {
-    "public": "public",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
-    "rewrites": [
-      {
-        "source": "**",
-        "destination": "/index.html"
-      }
-    ]
+  "name": "xsight-app",
+  "version": "1.0.0",
+  "description": "AI Query Builder - Xsight Static Web Application with Firebase services",
+  "scripts": {
+    "dev": "firebase emulators:start --only hosting",
+    "serve": "firebase serve --only hosting",
+    "build": "echo 'Static site - no build step required'",
+    "deploy": "firebase deploy --only hosting",
+    "deploy:full": "firebase deploy",
+    "emulators": "firebase emulators:start",
+    "emulators:ui": "firebase emulators:start --only firestore,auth,storage,hosting",
+    "logs": "firebase functions:log"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shak1947/xsight-app.git"
+  },
+  "keywords": [
+    "ai",
+    "firebase",
+    "javascript",
+    "query-builder",
+    "agents",
+    "static-site",
+    "web-app",
+    "authentication"
+  ],
+  "author": {
+    "name": "Your Name",
+    "email": "your.email@example.com"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "firebase-tools": "^13.0.0",
+    "http-server": "^14.1.1"
   }
 }
