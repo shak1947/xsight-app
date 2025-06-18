@@ -1,637 +1,811 @@
-// UI Manager - View Management Module
-import { showElement, hideElement, hideAllViews, showView, fadeIn, fadeOut, formatFileSize } from '../utils/helpers.js';
+/* ===== ENHANCED FORM STYLES ===== */
+.form-field {
+    margin-bottom: 1.5rem;
+}
 
-export class UIManager {
-    constructor() {
-        this.currentView = null;
-        this.agentsManager = null;
-        this.fileUploadManager = null;
-        
-        // DOM elements
-        this.views = {
-            dashboard: document.getElementById('dashboardView'),
-            projectDetail: document.getElementById('projectDetailView'),
-            agentDetail: document.getElementById('agentDetailView'),
-            agentForm: document.getElementById('agentFormView')
-        };
-        
-        this.loadingIndicator = document.getElementById('loadingIndicator');
-        this.errorMessage = document.getElementById('errorMessage');
-        this.mainContentArea = document.querySelector('.main-content-area');
-        
-        this.init();
-    }
-    
-    init() {
-        // Show dashboard by default
-        this.showDashboard();
-        
-        // Set up any global UI event listeners
-        this.setupGlobalEventListeners();
-    }
-    
-    setupGlobalEventListeners() {
-        // Handle escape key to close modals/forms
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                this.handleEscapeKey();
-            }
-        });
-        
-        // Handle browser back/forward buttons
-        window.addEventListener('popstate', (e) => {
-            this.handlePopState(e);
-        });
-    }
-    
-    handleEscapeKey() {
-        // If we're in agent form, go back to previous view
-        if (this.currentView === 'agentForm') {
-            this.cancelAgentForm();
-        }
-    }
-    
-    handlePopState(e) {
-        // Handle browser navigation - could be expanded for SPA routing
-        console.log('Browser navigation detected');
-    }
-    
-    setManagers(agentsManager, fileUploadManager) {
-        this.agentsManager = agentsManager;
-        this.fileUploadManager = fileUploadManager;
-    }
-    
-    showDashboard() {
-        this.currentView = 'dashboard';
-        this.updatePageTitle('Dashboard - Xsight');
-        showView(this.views, 'dashboard', this.mainContentArea);
-        this.hideLoading();
-        this.hideMessage();
-        console.log("📱 Showing dashboard view");
-    }
-    
-    showProjectDetail(project) {
-        if (!project) {
-            console.error('No project provided to showProjectDetail');
-            return;
-        }
-        
-        this.currentView = 'projectDetail';
-        this.updatePageTitle(`${project.name} - Xsight`);
-        
-        // Update project detail content
-        const projectDetailName = document.getElementById('projectDetailName');
-        const projectDetailId = document.getElementById('projectDetailId');
-        
-        if (projectDetailName) {
-            projectDetailName.textContent = project.name;
-        }
-        if (projectDetailId) {
-            projectDetailId.textContent = `ID: ${project.id}`;
-        }
-        
-        showView(this.views, 'projectDetail', this.mainContentArea);
-        this.hideLoading();
-        console.log("📱 Showing project detail view for:", project.name);
-    }
-    
-    showAgentDetail(agent) {
-        if (!agent) {
-            console.error('No agent provided to showAgentDetail');
-            return;
-        }
-        
-        this.currentView = 'agentDetail';
-        this.updatePageTitle(`${agent.name} - Xsight`);
-        this.renderAgentDetailView(agent);
-        showView(this.views, 'agentDetail', this.mainContentArea);
-        this.hideLoading();
-        console.log("📱 Showing agent detail view for:", agent.name);
-    }
-    
-    showAgentForm() {
-        this.currentView = 'agentForm';
-        this.updatePageTitle('Agent Form - Xsight');
-        this.renderAgentFormView();
-        showView(this.views, 'agentForm', this.mainContentArea);
-        this.hideLoading();
-        console.log("📱 Showing agent form view");
-    }
-    
-    renderAgentDetailView(agent) {
-        if (!this.views.agentDetail) {
-            console.error('Agent detail view element not found');
-            return;
-        }
-        
-        // Build training materials HTML
-        const trainingMaterialsHTML = this.renderTrainingMaterialsList(agent.trainingMaterials || []);
-        
-        // Build GPT models HTML
-        const gptModelsHTML = (agent.selectedGpts || []).length > 0 ? 
-            agent.selectedGpts.map(gpt => `<span class="gpt-model-tag">${gpt}</span>`).join(' ') :
-            '<p style="color: #64748b; font-style: italic;">No AI models selected.</p>';
-        
-        // Build instructions HTML
-        const instructionsHTML = agent.initialInstructions ? 
-            `<pre style="white-space: pre-wrap; font-family: inherit; margin: 0; line-height: 1.5;">${this.escapeHtml(agent.initialInstructions)}</pre>` : 
-            '<p style="color: #64748b; font-style: italic;">No initial instructions provided.</p>';
-        
-        this.views.agentDetail.innerHTML = `
-            <div class="agent-detail-header">
-                <div class="agent-detail-title">
-                    <h2>🤖 ${this.escapeHtml(agent.name)}</h2>
-                    <p class="agent-detail-description">${this.escapeHtml(agent.description || 'No description provided.')}</p>
-                </div>
-                <div class="agent-detail-actions">
-                    <button class="logout-btn" style="background-color: #3b82f6; margin-right: 0.5rem;" onclick="showAgentFormForEdit()" title="Edit this agent">
-                        ✏️ Edit Agent
-                    </button>
-                    <button class="logout-btn delete-btn" onclick="deleteAgent()" title="Delete this agent">
-                        🗑️ Delete Agent
-                    </button>
-                </div>
-            </div>
-            
-            <div class="agent-detail-content">
-                <!-- Initial Instructions Section -->
-                <div class="form-section">
-                    <div class="section-title">📝 Initial Instructions</div>
-                    <div class="agent-instructions-display">
-                        ${instructionsHTML}
-                    </div>
-                </div>
-                
-                <!-- AI Models Section -->
-                <div class="form-section">
-                    <div class="section-title">🧠 Available AI Models</div>
-                    <div class="agent-gpt-models">
-                        ${gptModelsHTML}
-                    </div>
-                    ${(agent.selectedGpts || []).length === 0 ? 
-                        '<p style="color: #f59e0b; font-size: 0.9rem; margin-top: 0.5rem;">⚠️ No AI models selected. Edit this agent to add models.</p>' : ''
-                    }
-                </div>
-                
-                <!-- Training Materials Section -->
-                <div class="form-section">
-                    <div class="section-title">📁 Training Materials (${(agent.trainingMaterials || []).length})</div>
-                    <div id="trainingMaterialsList" class="training-materials-list">
-                        ${trainingMaterialsHTML}
-                    </div>
-                    <div id="fileUploadSection" class="file-upload-section">
-                        <!-- File upload UI will be inserted here by FileUploadManager -->
-                    </div>
-                </div>
-                
-                <!-- Demo Section -->
-                <div class="form-section">
-                    <div class="section-title">🚀 Test Your Agent</div>
-                    <div class="demo-input-section">
-                        <textarea id="demoInput" class="textarea" placeholder="Enter your query or question for the agent...
+.form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.9rem;
+}
 
-Examples:
-• Analyze this data and provide insights
-• Summarize the key points from the uploaded documents
-• Generate a report based on the training materials
-• Answer questions about the uploaded content" rows="6"></textarea>
-                        <div class="char-hint">
-                            Enter a question or prompt to test how your agent would respond based on its training materials and selected AI models.
-                        </div>
-                        <button onclick="runDemo()" class="analyze-btn" style="margin-top: 1rem;" 
-                                ${(agent.selectedGpts || []).length === 0 ? 'disabled title="Please add AI models to this agent first"' : ''}>
-                            🤖 Run Demo Query
-                        </button>
-                        ${(agent.selectedGpts || []).length === 0 ? 
-                            '<p style="color: #f59e0b; font-size: 0.85rem; margin-top: 0.5rem;">⚠️ Add AI models to this agent to enable demo functionality.</p>' : ''
-                        }
-                    </div>
-                </div>
-                
-                <!-- Demo Results -->
-                <div id="agentDemoResults" class="results" style="display: none;">
-                    <!-- Demo results will be inserted here -->
-                </div>
-            </div>
-        `;
-        
-        // Initialize file upload for this agent
-        if (this.fileUploadManager) {
-            setTimeout(() => {
-                this.fileUploadManager.initializeForAgent(agent.id);
-            }, 100);
-        }
-        
-        // Add any additional event listeners for this view
-        this.setupAgentDetailEventListeners();
-    }
-    
-    setupAgentDetailEventListeners() {
-        // Add enter key support for demo input
-        const demoInput = document.getElementById('demoInput');
-        if (demoInput) {
-            demoInput.addEventListener('keydown', (e) => {
-                if (e.ctrlKey && e.key === 'Enter') {
-                    e.preventDefault();
-                    if (window.runDemo) {
-                        window.runDemo();
-                    }
-                }
-            });
-        }
-        
-        // Auto-resize textarea
-        if (demoInput) {
-            demoInput.addEventListener('input', () => {
-                demoInput.style.height = 'auto';
-                demoInput.style.height = demoInput.scrollHeight + 'px';
-            });
-        }
-    }
-    
-    renderAgentFormView() {
-        if (!this.views.agentForm) {
-            console.error('Agent form view element not found');
-            return;
-        }
-        
-        this.views.agentForm.innerHTML = `
-            <div class="form-section">
-                <div id="agentFormTitle" class="section-title">➕ Create New Agent</div>
-                
-                <form id="agentForm" novalidate>
-                    <div class="form-field" style="margin-bottom: 1.5rem;">
-                        <label for="agentFormName" class="form-label">Agent Name *</label>
-                        <input type="text" id="agentFormName" class="form-input" 
-                               placeholder="e.g., Customer Support Bot, Data Analyst, Content Creator" 
-                               required maxlength="100">
-                        <div class="field-hint">Choose a descriptive name for your agent (max 100 characters)</div>
-                    </div>
-                    
-                    <div class="form-field" style="margin-bottom: 1.5rem;">
-                        <label for="agentFormDescription" class="form-label">Description</label>
-                        <textarea id="agentFormDescription" class="form-textarea" 
-                                  placeholder="Describe what this agent does, its purpose, and how it should behave...
+.form-input,
+.form-textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
 
-Examples:
-• A customer support agent that helps users with product questions
-• A data analyst that provides insights from uploaded datasets
-• A content creator that generates marketing copy" 
-                                  rows="4" maxlength="500"></textarea>
-                        <div class="field-hint">Provide a clear description of the agent's purpose and capabilities (max 500 characters)</div>
-                    </div>
-                    
-                    <div class="form-field" style="margin-bottom: 1.5rem;">
-                        <label for="agentFormInitialInstructions" class="form-label">Initial Instructions</label>
-                        <textarea id="agentFormInitialInstructions" class="form-textarea" 
-                                  placeholder="Enter detailed instructions for the agent...
+.form-input:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
 
-Example:
-You are a helpful customer support representative. Always:
-- Be polite and professional
-- Ask clarifying questions when needed
-- Use the uploaded knowledge base to answer questions
-- If you don't know something, admit it and offer to escalate
-- Keep responses concise but thorough" 
-                                  rows="8" maxlength="2000"></textarea>
-                        <div class="field-hint">These instructions will be sent to the AI model before each conversation (max 2000 characters)</div>
-                    </div>
-                    
-                    <div class="form-field" style="margin-bottom: 2rem;">
-                        <label class="form-label">AI Models to Use *</label>
-                        <div id="gptFormSelectionOptions" class="gpt-selection-container">
-                            <p style="color: #64748b; font-size: 0.85rem;">Loading AI model options...</p>
-                        </div>
-                        <div class="field-hint">Select which AI models this agent can use. Different models have different strengths.</div>
-                    </div>
-                    
-                    <div class="form-actions">
-                        <button type="submit" id="agentFormSubmitBtn" class="btn-primary">
-                            Create Agent
-                        </button>
-                        <button type="button" id="agentFormCancelBtn" class="btn-secondary">
-                            Cancel
-                        </button>
-                    </div>
-                </form>
-            </div>
-        `;
-        
-        // Add form event listeners
-        this.setupAgentFormEventListeners();
+.form-textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.field-hint {
+    font-size: 0.8rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+    line-height: 1.4;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.btn-primary {
+    flex: 1;
+    padding: 0.875rem 1.5rem;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #059669, #047857);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-primary:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-secondary {
+    flex: 1;
+    padding: 0.875rem 1.5rem;
+    background: #f3f4f6;
+    color: #374151;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+    background: #e5e7eb;
+    border-color: #d1d5db;
+}
+
+/* ===== GPT SELECTION STYLES ===== */
+.gpt-selection-container {
+    max-height: 250px;
+    overflow-y: auto;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1rem;
+    background: #fafafa;
+}
+
+.gpt-option-checkbox {
+    margin-bottom: 0.75rem;
+}
+
+.gpt-option-checkbox label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+}
+
+.gpt-option-checkbox label:hover {
+    background-color: #f0f9ff;
+}
+
+.gpt-option-checkbox input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #3b82f6;
+}
+
+/* ===== TRAINING MATERIALS GRID ===== */
+.training-materials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.training-material-item {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1rem;
+    transition: all 0.2s;
+}
+
+.training-material-item:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.training-material-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.training-material-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.training-material-info {
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.training-material-name {
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.25rem;
+    word-break: break-word;
+}
+
+.training-material-meta {
+    font-size: 0.8rem;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.training-material-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
+.training-material-action-btn {
+    padding: 0.5rem;
+    background: none;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+}
+
+.training-material-action-btn.view-btn:hover {
+    background-color: #eff6ff;
+    border-color: #3b82f6;
+    color: #1e40af;
+}
+
+.training-material-action-btn.delete-btn:hover {
+    background-color: #fef2f2;
+    border-color: #ef4444;
+    color: #dc2626;
+}
+
+/* ===== EMPTY STATE STYLES ===== */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #6b7280;
+}
+
+.empty-state-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.empty-state-text {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #374151;
+}
+
+.empty-state-hint {
+    font-size: 0.9rem;
+    color: #6b7280;
+    margin: 0;
+}
+
+/* ===== DEMO SECTION STYLES ===== */
+.demo-input-section {
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 1.5rem;
+    border: 1px solid #e2e8f0;
+}
+
+.demo-input-section .textarea {
+    background: white;
+    border: 2px solid #e5e7eb;
+    margin-bottom: 0.75rem;
+}
+
+.demo-input-section .textarea:focus {
+    border-color: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+/* ===== ERROR MESSAGE STYLES ===== */
+.error-message {
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-weight: 500;
+    border: 1px solid;
+    display: none;
+}
+
+.error-message.error {
+    background-color: #fef2f2;
+    color: #dc2626;
+    border-color: #fecaca;
+}
+
+.error-message.success {
+    background-color: #f0fdf4;
+    color: #166534;
+    border-color: #bbf7d0;
+}
+
+/* ===== RESPONSIVE ENHANCEMENTS ===== */
+@media (max-width: 768px) {
+    .training-materials-grid {
+        grid-template-columns: 1fr;
     }
     
-    setupAgentFormEventListeners() {
-        // Character counters for text inputs
-        const nameInput = document.getElementById('agentFormName');
-        const descInput = document.getElementById('agentFormDescription');
-        const instructionsInput = document.getElementById('agentFormInitialInstructions');
-        
-        [nameInput, descInput, instructionsInput].forEach(input => {
-            if (input) {
-                input.addEventListener('input', () => this.updateCharacterCount(input));
-            }
-        });
-        
-        // Auto-resize textareas
-        [descInput, instructionsInput].forEach(textarea => {
-            if (textarea) {
-                textarea.addEventListener('input', () => {
-                    textarea.style.height = 'auto';
-                    textarea.style.height = textarea.scrollHeight + 'px';
-                });
-            }
-        });
-        
-        // Form validation on submit
-        const form = document.getElementById('agentForm');
-        if (form) {
-            form.addEventListener('submit', (e) => {
-                if (!this.validateAgentForm()) {
-                    e.preventDefault();
-                }
-            });
-        }
+    .form-actions {
+        flex-direction: column;
     }
     
-    updateCharacterCount(input) {
-        const maxLength = input.getAttribute('maxlength');
-        const currentLength = input.value.length;
-        
-        if (maxLength) {
-            let hintElement = input.parentNode.querySelector('.field-hint');
-            if (hintElement) {
-                const originalText = hintElement.textContent;
-                const countText = `${currentLength}/${maxLength} characters`;
-                
-                if (!originalText.includes('characters)')) {
-                    hintElement.textContent = originalText + ` (${countText})`;
-                } else {
-                    hintElement.textContent = originalText.replace(/\(\d+\/\d+ characters\)/, `(${countText})`);
-                }
-                
-                // Color code based on usage
-                if (currentLength > maxLength * 0.9) {
-                    hintElement.style.color = '#ef4444';
-                } else if (currentLength > maxLength * 0.7) {
-                    hintElement.style.color = '#f59e0b';
-                } else {
-                    hintElement.style.color = '#64748b';
-                }
-            }
-        }
+    .agent-detail-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
     }
     
-    validateAgentForm() {
-        const nameInput = document.getElementById('agentFormName');
-        const gptOptions = document.getElementById('gptFormSelectionOptions');
-        
-        let isValid = true;
-        let errors = [];
-        
-        // Validate name
-        if (!nameInput?.value.trim()) {
-            errors.push('Agent name is required');
-            isValid = false;
-            if (nameInput) {
-                nameInput.style.borderColor = '#ef4444';
-                nameInput.focus();
-            }
-        } else if (nameInput) {
-            nameInput.style.borderColor = '#cbd5e1';
-        }
-        
-        // Validate at least one GPT model is selected
-        const selectedGpts = gptOptions?.querySelectorAll('input[name="selectedGpts"]:checked');
-        if (!selectedGpts || selectedGpts.length === 0) {
-            errors.push('Please select at least one AI model');
-            isValid = false;
-            if (gptOptions) {
-                gptOptions.style.borderColor = '#ef4444';
-            }
-        } else if (gptOptions) {
-            gptOptions.style.borderColor = '#e2e8f0';
-        }
-        
-        // Show errors
-        if (errors.length > 0) {
-            this.showError(errors.join('. '));
-        } else {
-            this.hideMessage();
-        }
-        
-        return isValid;
+    .agent-detail-actions {
+        justify-content: stretch;
+        gap: 0.75rem;
     }
     
-    renderTrainingMaterialsList(materials) {
-        if (!materials || materials.length === 0) {
-            return `
-                <div class="empty-state">
-                    <div class="empty-state-icon">📄</div>
-                    <p class="empty-state-text">No training materials uploaded yet</p>
-                    <p class="empty-state-hint">Upload documents, PDFs, or text files to train your agent</p>
-                </div>
-            `;
-        }
-        
-        return `
-            <div class="training-materials-grid">
-                ${materials.map(material => `
-                    <div class="training-material-item">
-                        <div class="training-material-header">
-                            <div class="training-material-icon">
-                                ${this.getFileIcon(material.name)}
-                            </div>
-                            <div class="training-material-info">
-                                <div class="training-material-name" title="${this.escapeHtml(material.name)}">
-                                    ${this.escapeHtml(this.truncateFileName(material.name, 30))}
-                                </div>
-                                <div class="training-material-meta">
-                                    <span>${formatFileSize(material.size)}</span>
-                                    <span>•</span>
-                                    <span>${this.formatDate(material.uploadedAt)}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="training-material-actions">
-                            <button class="training-material-action-btn view-btn" onclick="window.open('${material.url}', '_blank')" title="View file">
-                                👁️
-                            </button>
-                            <button class="training-material-action-btn delete-btn" onclick="deleteTrainingMaterial('${this.escapeHtml(material.name)}')" title="Delete file">
-                                🗑️
-                            </button>
-                        </div>
-                    </div>
-                `).join('')}
-            </div>
-        `;
+    .agent-detail-actions button {
+        flex: 1;
     }
     
-    getFileIcon(fileName) {
-        const extension = fileName.split('.').pop().toLowerCase();
-        const iconMap = {
-            'pdf': '📄',
-            'doc': '📝',
-            'docx': '📝',
-            'txt': '📃',
-            'md': '📃',
-            'csv': '📊',
-            'json': '🔧',
-            'xlsx': '📊',
-            'xls': '📊'
-        };
-        return iconMap[extension] || '📄';
+    .training-material-header {
+        flex-direction: column;
+        gap: 0.5rem;
     }
     
-    truncateFileName(fileName, maxLength) {
-        if (fileName.length <= maxLength) return fileName;
-        
-        const extension = fileName.split('.').pop();
-        const nameWithoutExt = fileName.slice(0, fileName.lastIndexOf('.'));
-        const truncatedName = nameWithoutExt.slice(0, maxLength - extension.length - 4) + '...';
-        
-        return truncatedName + '.' + extension;
+    .training-material-actions {
+        justify-content: center;
+        margin-top: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .demo-input-section {
+        padding: 1rem;
     }
     
-    formatDate(dateString) {
-        try {
-            const date = new Date(dateString);
-            const now = new Date();
-            const diffMs = now - date;
-            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-            
-            if (diffDays === 0) {
-                return 'Today';
-            } else if (diffDays === 1) {
-                return 'Yesterday';
-            } else if (diffDays < 7) {
-                return `${diffDays} days ago`;
-            } else {
-                return date.toLocaleDateString();
-            }
-        } catch (error) {
-            return 'Unknown date';
-        }
+    .gpt-selection-container {
+        padding: 0.75rem;
     }
     
-    escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
+    .training-material-item {
+        padding: 0.75rem;
     }
     
-    updatePageTitle(title) {
-        document.title = title;
+    .empty-state {
+        padding: 2rem 0.5rem;
     }
     
-    showLoading() {
-        showElement(this.loadingIndicator);
-        if (this.mainContentArea) {
-            this.mainContentArea.style.opacity = '0.6';
-            this.mainContentArea.style.pointerEvents = 'none';
-        }
+    .empty-state-icon {
+        font-size: 2.5rem;
     }
-    
-    hideLoading() {
-        hideElement(this.loadingIndicator);
-        if (this.mainContentArea) {
-            this.mainContentArea.style.opacity = '1';
-            this.mainContentArea.style.pointerEvents = 'auto';
-        }
-    }
-    
-    showError(message) {
-        if (this.errorMessage) {
-            this.errorMessage.textContent = message;
-            this.errorMessage.className = 'error-message error';
-            showElement(this.errorMessage);
-            
-            // Scroll to message
-            this.errorMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-    }
-    
-    showSuccess(message) {
-        if (this.errorMessage) {
-            this.errorMessage.textContent = message;
-            this.errorMessage.className = 'error-message success';
-            showElement(this.errorMessage);
-            
-            // Auto-hide success messages after 5 seconds
-            setTimeout(() => {
-                this.hideMessage();
-            }, 5000);
-            
-            // Scroll to message
-            this.errorMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-    }
-    
-    hideMessage() {
-        hideElement(this.errorMessage);
-    }
-    
-    cancelAgentForm() {
-        // Reset any form validation states
-        const form = document.getElementById('agentForm');
-        if (form) {
-            form.querySelectorAll('input, textarea, select').forEach(field => {
-                field.style.borderColor = '';
-            });
-        }
-        
-        // Navigate back to appropriate view
-        if (this.agentsManager && this.agentsManager.getSelectedAgent()) {
-            const agent = this.agentsManager.getSelectedAgent();
-            this.showAgentDetail(agent);
-        } else {
-            // Go back to project view or dashboard
-            const selectedProject = window.projectsManager?.getSelectedProject();
-            if (selectedProject) {
-                this.showProjectDetail(selectedProject);
-            } else {
-                this.showDashboard();
-            }
-        }
-    }
-    
-    getCurrentView() {
-        return this.currentView;
-    }
-    
-    // Utility method to refresh current view
-    refreshCurrentView() {
-        switch (this.currentView) {
-            case 'agentDetail':
-                if (this.agentsManager) {
-                    const agent = this.agentsManager.getSelectedAgent();
-                    if (agent) {
-                        this.showAgentDetail(agent);
-                    }
-                }
-                break;
-            case 'projectDetail':
-                if (window.projectsManager) {
-                    const project = window.projectsManager.getSelectedProject();
-                    if (project) {
-                        this.showProjectDetail(project);
-                    }
-                }
-                break;
-            default:
-                // No refresh needed for dashboard or form views
-                break;
-        }
-    }
-    
-    // Method to show confirmation dialogs
-    showConfirmDialog(message, onConfirm, onCancel = null) {
-        const result = window.confirm(message);
-        if (result && onConfirm) {
-            onConfirm();
-        } else if (!result && onCancel) {
-            onCancel();
-        }
-        return result;
-    }
+}/* ===== SIDEBAR COMPONENTS ===== */
+.left-sidebar {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    width: 280px;
+    flex-shrink: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.sidebar-section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.sidebar-section-title svg {
+    width: 1.2em;
+    height: 1.2em;
+}
+
+.sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-list-item {
+    margin-bottom: 0.5rem;
+}
+
+.sidebar-list-item a,
+.sidebar-list-item button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #475569;
+    font-weight: 500;
+    background: transparent;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.sidebar-list-item a:hover,
+.sidebar-list-item button:hover {
+    background-color: #f0f4f8;
+    color: #1e40af;
+}
+
+.sidebar-list-item.active > a,
+.sidebar-list-item.active > button {
+    background-color: #e0f2f7;
+    color: #1e40af;
+    font-weight: 600;
+}
+
+/* ===== FORM COMPONENTS ===== */
+.form-section {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.create-item-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e2e8f0;
+    margin-top: 1rem;
+}
+
+.create-item-form input,
+.create-item-form textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.create-item-form input:focus,
+.create-item-form textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.create-item-form button {
+    padding: 0.75rem;
+    background-color: #10b981;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+
+.create-item-form button:hover {
+    background-color: #059669;
+}
+
+.create-new-agent-btn {
+    background-color: #10b981;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-left: 1rem;
+    transition: background-color 0.2s;
+}
+
+.create-new-agent-btn:hover {
+    background-color: #059669;
+}
+
+/* ===== INPUT COMPONENTS ===== */
+.textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 1rem;
+    resize: vertical;
+    transition: border-color 0.2s;
+    font-family: inherit;
+}
+
+.textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.char-hint {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin-top: 0.5rem;
+}
+
+/* ===== BUTTON COMPONENTS ===== */
+.analyze-btn {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.analyze-btn:hover {
+    background: linear-gradient(135deg, #059669, #047857);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+}
+
+/* ===== FILE UPLOAD COMPONENTS ===== */
+.file-upload-section {
+    border: 2px dashed #d1d5db;
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    background: #f9fafb;
+    margin-top: 1rem;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.file-upload-section:hover {
+    border-color: #3b82f6;
+    background: #eff6ff;
+}
+
+.file-upload-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+}
+
+.file-upload-controls input[type="file"] {
+    display: block;
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background-color: white;
+    font-size: 0.9rem;
+}
+
+.file-upload-controls button {
+    padding: 0.6rem 1.2rem;
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+
+.file-upload-controls button:hover {
+    background-color: #1e40af;
+}
+
+/* ===== PROGRESS COMPONENTS ===== */
+.upload-progress-container {
+    width: 100%;
+    background-color: #e2e8f0;
+    border-radius: 8px;
+    overflow: hidden;
+    height: 10px;
+}
+
+.upload-progress-bar {
+    height: 100%;
+    width: 0%;
+    background-color: #10b981;
+    transition: width 0.1s ease-out;
+    border-radius: 8px;
+}
+
+.upload-status-message {
+    font-size: 0.85rem;
+    color: #475569;
+}
+
+/* ===== AGENT COMPONENTS ===== */
+.agent-in-project-item {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: all 0.2s;
+}
+
+.agent-in-project-item:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.agent-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.agent-item-header h3 {
+    margin: 0;
+    color: #1e293b;
+    font-size: 1.1rem;
+}
+
+.agent-item-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.agent-action-btn {
+    padding: 0.4rem 0.8rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.select-btn {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.select-btn:hover {
+    background-color: #1e40af;
+    transform: translateY(-1px);
+}
+
+.agent-item-description {
+    color: #64748b;
+    margin: 0 0 1rem 0;
+    line-height: 1.5;
+}
+
+.agent-item-stats {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+/* ===== AGENT DETAIL COMPONENTS ===== */
+.agent-detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.agent-detail-title h2 {
+    margin: 0 0 0.5rem 0;
+    color: #1e293b;
+    font-size: 2rem;
+}
+
+.agent-detail-description {
+    color: #64748b;
+    font-size: 1.1rem;
+    margin: 0;
+    line-height: 1.6;
+}
+
+.agent-detail-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.agent-instructions-display {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 1rem;
+    min-height: 60px;
+}
+
+.agent-gpt-models {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.gpt-model-tag {
+    background: #dbeafe;
+    color: #1e40af;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border: 1px solid #bfdbfe;
+}
+
+/* ===== TRAINING MATERIALS COMPONENTS ===== */
+.training-materials-list {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+}
+
+.training-material-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #f1f5f9;
+    transition: background-color 0.2s;
+}
+
+.training-material-list-item:last-child {
+    border-bottom: none;
+}
+
+.training-material-list-item:hover {
+    background-color: #f8fafc;
+}
+
+.training-material-info {
+    flex-grow: 1;
+}
+
+.training-material-name {
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 0.25rem;
+}
+
+.training-material-meta {
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+.training-material-delete-btn {
+    background: none;
+    border: none;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 4px;
+    transition: all 0.2s;
+    font-size: 1rem;
+}
+
+.training-material-delete-btn:hover {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+/* ===== PROJECT COMPONENTS ===== */
+.project-header {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.project-header h2 {
+    margin: 0;
+    color: #1e293b;
+    font-size: 2rem;
+}
+
+.project-header p {
+    margin: 0;
+    color: #64748b;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+}
+
+.agent-list-in-project {
+    min-height: 200px;
 }
