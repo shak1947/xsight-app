@@ -1,1 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xsight App</title>
+    <!-- Link to your external CSS file -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
+    <!-- App Header -->
+    <div class="app-header">
+        <div class="app-logo">🔍 Xsight - Query Builder</div>
+        <a href="#" id="logoutBtn" class="logout-btn">Sign Out</a>
+    </div>
+
+    <!-- Protected Content Section -->
+    <div id="protectedContent" class="protected-content">
+        <div class="main-app-layout">
+            <!-- Left Sidebar -->
+            <div class="left-sidebar">
+                <!-- Projects Section -->
+                <div class="projects-section">
+                    <div class="sidebar-section-title">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                            <path fill-rule="evenodd" d="M11.47 2.47a.75.75 0 0 1 1.06 0l4.5 4.5a.75.75 0 0 1-1.06 1.06L12 4.06l-3.97 3.97a.75.75 0 0 1-1.06-1.06l4.5-4.5ZM11.25 4.5l-.25.25v8.75a.75.75 0 0 0 1.5 0V4.75l-.25-.25ZM3.75 8.25a.75.75 0 0 1 .75.75v10.5a.75.75 0 0 1-.75.75h-.75a.75.75 0 0 1-.75-.75V9a.75.75 0 0 1 .75-.75h.75ZM6 8.25a.75.75 0 0 1 .75.75v10.5a.75.75 0 0 1-.75.75h-.75a.75.75 0 0 1-.75-.75V9a.75.75 0 0 1 .75-.75h.75ZM8.25 8.25a.75.75 0 0 1 .75.75v10.5a.75.75 0 0 1-.75.75h-.75a.75.75 0 0 1-.75-.75V9a.75.75 0 0 1 .75-.75h.75ZM15.75 8.25a.75.75 0 0 1 .75.75v10.5a.75.75 0 0 1-.75.75h-.75a.75.75 0 0 1-.75-.75V9a.75.75 0 0 1 .75-.75h.75ZM18 8.25a.75.75 0 0 1 .75.75v10.5a.75.75 0 0 1-.75.75h-.75a.75.75 0 0 1-.75-.75V9a.75.75 0 0 1 .75-.75h.75ZM20.25 8.25a.75.75 0 0 1 .75.75v10.5a.75.75 0 0 1-.75.75h-.75a.75.75 0 0 1-.75-.75V9a.75.75 0 0 1 .75-.75h.75Z" clip-rule="evenodd" />
+                        </svg>
+                        My Projects
+                    </div>
+                    <ul id="projectsList" class="sidebar-list">
+                        <!-- Projects will be loaded here dynamically -->
+                        <li class="sidebar-list-item">Loading projects...</li>
+                    </ul>
+                    <form id="createProjectForm" class="create-item-form">
+                        <input type="text" id="newProjectName" placeholder="New Project Name" required>
+                        <button type="submit">Create Project</button>
+                    </form>
+                </div>
+
+                <!-- AI Agents List Section (only list, form moved) -->
+                <div id="agentsSection" class="agents-section" style="display:none;">
+                    <div class="sidebar-section-title">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                            <path fill-rule="evenodd" d="M19.952 1.651a.75.75 0 0 1 .325.385l3.123 7.267a.75.75 0 0 1-.326.93l-6.005 3.107a3 3 0 0 0-2.366.621l-2.617 1.961 1.603 3.657a.75.75 0 0 1-1.378.484l-2.096-4.781-1.961 2.617a3 3 0 0 0-.621 2.366l-3.107 6.005a.75.75 0 0 1-.93.326L1.65 19.952a.75.75 0 0 1-.385-.325l-1.285-2.987a.75.75 0 0 1 .793-.984l6.236-1.127c.307-.055.603-.131.89-.228l3.107-6.005a3 3 0 0 0-.621-2.366L6.96 1.948a.75.75 0 0 1 .484-1.378L19.952 1.65ZM5.485 5.58a1.5 1.5 0 0 1 2.036-.343.75.75 0 0 0 1.002-1.118A3 3 0 0 0 4.09 5.093a.75.75 0 0 0 .548 1.139.75.75 0 0 0 .847-.652Z" clip-rule="evenodd" />
+                        </svg>
+                        AI Agents (<span id="currentProjectName"></span>)
+                    </div>
+                    <ul id="agentsList" class="sidebar-list">
+                        <!-- Agents for selected project will be loaded here dynamically -->
+                        <li class="sidebar-list-item">Select a project to see agents.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Main Content Area (Dynamic) -->
+            <div class="main-content-area">
+                <div id="loadingIndicator" style="text-align: center; padding: 2rem; display: none;">Loading...</div>
+                <div id="errorMessage" style="text-align: center; padding: 2rem; color: red; display: none;"></div>
+
+                <div id="dashboardView" class="query-builder content-view">
+                    <div class="page-title">
+                        <h1>Welcome to Xsight - AI Query Builder</h1>
+                        <p>Start by creating a new project or selecting an existing one from the left sidebar.</p>
+                    </div>
+                    <div class="form-section">
+                        <div class="section-title">
+                            👋 Get Started
+                        </div>
+                        <p>Use projects to organize your AI agents and their training materials. Agents can help you analyze data, generate content, and more!</p>
+                    </div>
+                </div>
+
+                <div id="projectDetailView" class="project-detail-view content-view" style="display:none;">
+                    <div class="project-header">
+                        <h2 id="projectDetailName">Project Name</h2>
+                        <p id="projectDetailId">ID: Loading...</p>
+                        <button class="logout-btn" style="background-color: #ef4444;" onclick="deleteProject()">Delete Project</button>
+                        <div class="section-title" style="margin-top: 2rem;">
+                            🤖 Agents in this Project
+                            <button class="create-new-agent-btn" onclick="showAgentFormForCreate()">➕ Create New Agent</button>
+                        </div>
+                    </div>
+                    <div id="agentsInProjectList" class="agent-list-in-project">
+                        <!-- Agents will be loaded here dynamically -->
+                        No agents in this project yet.
+                    </div>
+                </div>
+
+                <div id="agentDetailView" class="agent-detail-view content-view" style="display:none;">
+                    <div class="agent-header">
+                        <h2 id="agentDetailName">Agent Name</h2>
+                        <p id="agentDetailDescription">Loading description...</p>
+                        <p id="agentDetailId">ID: Loading...</p>
+                        <p id="agentDetailGpts" style="color: #475569; font-size: 0.95rem; margin-top: 0.5rem;"><strong>GPTs Used:</strong> Loading...</p>
+                        <p id="agentDetailInitialInstructions" style="color: #475569; font-size: 0.95rem; margin-top: 0.5rem;"><strong>Initial Instructions:</strong> Loading...</p>
+                        <button class="logout-btn" style="background-color: #ef4444;" onclick="deleteAgent()">Delete Agent</button>
+                        <button class="logout-btn" style="background-color: #3b82f6; margin-right: 0.5rem;" onclick="showAgentFormForEdit(selectedAgentId)">✏️ Edit Agent</button>
+                    </div>
+
+                    <!-- Original Query Builder content - repurposed as agent specific -->
+                    <div class="query-builder">
+                        <div class="page-title" style="text-align: left; margin-bottom: 1rem;">
+                            <h1 style="font-size: 1.8rem; margin-top: 0;">Agent Specific Query</h1>
+                            <p style="font-size: 0.9rem;">Interact with <span id="currentAgentName"></span></p>
+                        </div>
+
+                        <!-- Background Context -->
+                        <div class="form-section">
+                            <div class="section-title">
+                                📋 Background Context (Optional)
+                            </div>
+                            <textarea 
+                                id="agentBackgroundText" 
+                                class="textarea" 
+                                placeholder="Provide context to help this AI agent understand your situation better..."
+                            ></textarea>
+                            <div class="char-hint">Help the AI understand your context for more accurate responses</div>
+                            
+                            <!-- File Upload Section - NOW FUNCTIONAL -->
+                            <div class="file-upload-section">
+                                <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">📁</div>
+                                <p><strong>Upload Training Materials</strong></p>
+                                <p style="color: #64748b; font-size: 0.875rem;">Documents, datasets, guidelines for this agent</p>
+                                
+                                <div class="file-upload-controls">
+                                    <input type="file" id="trainingMaterialInput" multiple accept=".pdf,.doc,.docx,.txt,.csv,.json">
+                                    <button id="uploadFilesBtn">Upload File(s)</button>
+                                    <div id="uploadProgressContainer" class="upload-progress-container" style="display:none;">
+                                        <div id="uploadProgressBar" class="upload-progress-bar"></div>
+                                    </div>
+                                    <div id="uploadStatus" class="upload-status-message"></div>
+                                </div>
+
+                                <ul id="agentTrainingMaterialsList" class="training-material-list">
+                                    <!-- Uploaded files will be listed here -->
+                                    <li style="text-align: center; color: #64748b; font-size: 0.85rem;">No training materials uploaded yet.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Your Question -->
+                        <div class="form-section">
+                            <div class="section-title">
+                                ❓ Your Question for Agent
+                            </div>
+                            <textarea 
+                                id="agentQueryText" 
+                                class="textarea" 
+                                placeholder="Ask your question for this specific AI agent..."
+                                style="min-height: 80px;"
+                            ></textarea>
+                            <div class="char-hint">Be specific about what you want to learn or analyze</div>
+                            
+                            <!-- This file upload is for analysis query, not persistent training -->
+                            <div class="file-upload-section">
+                                <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">📊</div>
+                                <p><strong>Upload files for analysis</strong></p>
+                                <p style="color: #64748b; font-size: 0.875rem;">Data, reports, documents for this agent to process</p>
+                                <p style="color: #64748b; font-size: 0.75rem; margin-top: 0.5rem;">File upload available in full version</p>
+                            </div>
+                        </div>
+
+                        <!-- Run Analysis Button -->
+                        <button class="analyze-btn" onclick="runDemo()">
+                            🚀 Interact with Agent
+                        </button>
+
+                        <!-- Demo Results -->
+                        <div class="results" id="agentDemoResults">
+                            <div class="results-header">
+                                <h3>🏆 Agent Response</h3>
+                                <p>Response from your selected AI Agent</p>
+                            </div>
+                            <div class="results-content">
+                                <p>This is a placeholder for the AI Agent's response based on your query and training materials.</p>
+                                <p style="margin-top: 1rem; font-style: italic; font-size: 0.9rem; color: #64748b;">(Actual AI interaction and file processing require a backend service beyond client-side HTML/JS.)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NEW: Agent Form View (for both Create and Edit) -->
+                <div id="agentFormView" class="agent-form-section content-view" style="display: none;">
+                    <h3 class="sidebar-section-title" style="margin-bottom: 1rem;" id="agentFormTitle">
+                        ➕ Create New Agent
+                    </h3>
+                    <form id="agentForm" class="create-item-form" style="border-top: none; margin-top: 0; padding-top: 0;">
+                        <input type="text" id="agentFormName" placeholder="Agent Name" required>
+                        <textarea id="agentFormDescription" placeholder="Brief Description" rows="2"></textarea>
+                        
+                        <div class="form-group">
+                            <label class="sidebar-section-title" style="margin-bottom: 0.5rem; font-size: 1rem;">
+                                Select GPT Models
+                            </label>
+                            <div id="gptFormSelectionOptions" class="gpt-selection-group">
+                                <!-- GPT checkboxes will be loaded here dynamically -->
+                                Loading GPT options...
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="agentFormInitialInstructions" class="sidebar-section-title" style="margin-bottom: 0.5rem; font-size: 1rem;">
+                                Initial Instructions / System Prompt (Optional)
+                            </label>
+                            <textarea id="agentFormInitialInstructions" placeholder="e.g., 'You are a helpful assistant that summarizes legal documents for clarity and conciseness.'" rows="3"></textarea>
+                            <div class="char-hint">Provide core instructions or a system prompt for this agent's behavior.</div>
+                        </div>
+                        
+                        <button type="submit" id="agentFormSubmitBtn">Create Agent</button>
+                        <button type="button" id="agentFormCancelBtn" style="background-color: #64748b; margin-top: 0.5rem;">Cancel</button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Message for unauthenticated/unverified users -->
+    <div id="authMessage" class="auth-message">
+        Please <a href="/login">log in</a> or <a href="/signup">sign up</a> and verify your email to access this page.
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        // Your web app's Firebase configuration - provided by user
+        const firebaseConfig = {
+          apiKey: "AIzaSyDViu75v5HVVmHH3UsieytGMduXoAXLBao",
+          authDomain: "xsight-f1b47.firebaseapp.com",
+          projectId: "xsight-f1b47",
+          storageBucket: "xsight-f1b47.firebasestorage.app",
+          messagingSenderId: "1070514994227",
+          appId: "1:1070514994227:web:ae8e902ff36d84bd77b746",
+          measurementId: "G-ZY2WQNWDR9" // measurementId is not used in auth but kept for completeness
+        };
+
+        // Firebase SDK imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { 
+            getAuth, 
+            onAuthStateChanged, 
+            signOut
+        } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            collection, 
+            query, 
+            onSnapshot, 
+            addDoc, 
+            doc, 
+            deleteDoc,
+            getDocs, 
+            setDoc,
+            updateDoc, 
+            arrayUnion, 
+            arrayRemove 
+        } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import {
+            getStorage,
+            ref,
+            uploadBytesResumable, 
+            getDownloadURL,
+            deleteObject 
+        } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js";
+
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const storage = getStorage(app); 
+
+        // --- Global Variables & State Management ---
+        let currentUser = null;
+        let currentUserId = null;
+        let selectedProjectId = null;
+        let selectedAgentId = null; // Agent currently being displayed in agentDetailView
+        let currentAgentBeingEditedId = null; // Agent currently being edited in agentFormView 
+        let allProjects = []; // Store projects in memory
+        let allAgents = [];   // Store agents in memory
+        let availableGptModels = []; // Store available GPT models
+
+        // --- DOM Elements ---
+        const protectedContent = document.getElementById('protectedContent');
+        const authMessage = document.getElementById('authMessage');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const errorMessageElem = document.getElementById('errorMessage');
+
+        // Sidebar elements
+        const projectsList = document.getElementById('projectsList');
+        const createProjectForm = document.getElementById('createProjectForm');
+        const newProjectNameInput = document.getElementById('newProjectName');
+        const agentsSection = document.getElementById('agentsSection');
+        const currentProjectNameSpan = document.getElementById('currentProjectName');
+        const agentsList = document.getElementById('agentsList');
+        
+        // Main Content Views
+        const dashboardView = document.getElementById('dashboardView');
+        const projectDetailView = document.getElementById('projectDetailView');
+        const agentDetailView = document.getElementById('agentDetailView');
+        const agentFormView = document.getElementById('agentFormView'); 
+        const views = {
+            dashboard: dashboardView,
+            projectDetail: projectDetailView,
+            agentDetail: agentDetailView,
+            agentForm: agentFormView 
+        };
+
+        // Project Detail elements
+        const projectDetailNameElem = document.getElementById('projectDetailName');
+        const projectDetailIdElem = document.getElementById('projectDetailId');
+        const agentsInProjectList = document.getElementById('agentsInProjectList');
+
+        // Agent Detail elements
+        const agentDetailNameElem = document.getElementById('agentDetailName');
+        const agentDetailDescriptionElem = document.getElementById('agentDetailDescription');
+        const agentDetailIdElem = document.getElementById('agentDetailId');
+        const agentDetailGptsElem = document.getElementById('agentDetailGpts'); 
+        const agentDetailInitialInstructionsElem = document.getElementById('agentDetailInitialInstructions');
+        const currentAgentNameSpan = document.getElementById('currentAgentName');
+        const agentDemoResults = document.getElementById('agentDemoResults');
+
+        // Agent Form Elements (within agentFormView)
+        const agentFormTitle = document.getElementById('agentFormTitle');
+        const agentForm = document.getElementById('agentForm');
+        const agentFormNameInput = document.getElementById('agentFormName');
+        const agentFormDescriptionInput = document.getElementById('agentFormDescription');
+        const gptFormSelectionOptionsDiv = document.getElementById('gptFormSelectionOptions'); 
+        const agentFormInitialInstructionsInput = document.getElementById('agentFormInitialInstructions');
+        const agentFormSubmitBtn = document.getElementById('agentFormSubmitBtn');
+        const agentFormCancelBtn = document.getElementById('agentFormCancelBtn');
+
+
+        // File Upload Elements (within Agent Detail View)
+        const trainingMaterialInput = document.getElementById('trainingMaterialInput');
+        const uploadFilesBtn = document.getElementById('uploadFilesBtn');
+        const uploadProgressContainer = document.getElementById('uploadProgressContainer');
+        const uploadProgressBar = document.getElementById('uploadProgressBar');
+        const uploadStatus = document.getElementById('uploadStatus');
+        const agentTrainingMaterialsList = document.getElementById('agentTrainingMaterialsList');
+
+
+        // --- Utility Functions ---
+
+        function showLoading() {
+            loadingIndicator.style.display = 'block';
+            hideAllViews();
+            errorMessageElem.style.display = 'none';
+        }
+
+        function hideLoading() {
+            loadingIndicator.style.display = 'none';
+        }
+
+        function showErrorMessage(message, isSuccess = false) {
+            errorMessageElem.textContent = message;
+            errorMessageElem.style.display = 'block';
+            errorMessageElem.className = 'message-box'; // Reset classes
+            if (isSuccess) {
+                errorMessageElem.classList.add('success');
+            } else {
+                errorMessageElem.classList.remove('success'); // Ensure it's not green for errors
+            }
+            hideLoading();
+            // Don't hide views on error, just display message
+        }
+
+        function hideErrorMessage() {
+            errorMessageElem.style.display = 'none';
+        }
+
+        function hideAllViews() {
+            Object.values(views).forEach(view => view.style.display = 'none');
+        }
+
+        function showView(viewId) {
+            hideAllViews();
+            views[viewId].style.display = 'block';
+            // Scroll to top of content area when view changes
+            document.querySelector('.main-content-area').scrollTo(0, 0);
+        }
+
+        // Function to run the demo (from your original code - now for agent view)
+        function runDemo() {
+            const agentBackgroundTextElem = document.getElementById('agentBackgroundText');
+            const agentQueryTextElem = document.getElementById('agentQueryText');
+            const queryText = agentQueryTextElem.value.trim();
+            
+            if (!queryText) {
+                console.log('Please enter a question for the agent to analyze.'); 
+                // In a real app, display a message to the user instead of console.log
+                return;
+            }
+            
+            agentDemoResults.style.display = 'block';
+            agentDemoResults.scrollIntoView({ behavior: 'smooth' }); 
+
+            // Clear the textboxes after the action
+            agentBackgroundTextElem.value = '';
+            agentQueryTextElem.value = '';
+        }
+        // Make runDemo available globally for onclick in HTML
+        window.runDemo = runDemo;
+
+
+        // --- Firestore Operations ---
+
+        // Get the base path for user-specific data
+        const getPrivateBasePath = () => {
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+            if (!currentUserId) {
+                console.warn("Attempted to get private base path without a userId. This might lead to data inconsistencies if not authenticated.");
+                return `artifacts/${appId}/users/anonymous-pre-auth`; 
+            }
+            return `artifacts/<span class="math-inline">\{appId\}/users/</span>{currentUserId}`;
+        };
+
+        // Get the base path for public data (like GPT models)
+        const getPublicBasePath = () => {
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+            return `artifacts/${appId}/public/data`;
+        };
+
+        // Real-time listener for Projects
+        let projectsUnsubscribe = null;
+        function setupProjectsListener() {
+            if (!currentUserId) {
+                console.log("No user ID for projects listener. Skipping.");
+                return; 
+            }
+
+            if (projectsUnsubscribe) projectsUnsubscribe(); 
+
+            const projectsColRef = collection(db, `${getPrivateBasePath()}/projects`);
+            const q = query(projectsColRef);
+
+            projectsUnsubscribe = onSnapshot(q, (snapshot) => {
+                allProjects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderProjects();
+                console.log("Projects updated:", allProjects);
+                if (selectedProjectId && !allProjects.some(p => p.id === selectedProjectId)) {
+                    selectedProjectId = null;
+                    selectedAgentId = null;
+                    showView('dashboard');
+                    agentsSection.style.display = 'none'; 
+                } else if (selectedProjectId) {
+                    renderAgentsInProject();
+                    renderAgentsSidebar();
+                } else {
+                     agentsSection.style.display = 'none';
+                }
+            }, (error) => {
+                console.error("Error fetching projects:", error);
+                showErrorMessage("Failed to load
