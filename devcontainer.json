@@ -1,0 +1,12 @@
+{
+  "name": "Codespace for Xsight App",
+  // Use a base image
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+
+  "features": {
+    // Install Node.js
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "18"
+    }
+  }
+}
