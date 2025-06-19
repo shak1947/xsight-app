@@ -8,12 +8,12 @@
 import { AuthManager } from './modules/auth.js';
 import { Router } from './modules/router.js';
 import { UIManager } from './modules/ui.js';
-// Import page rendering functions
-import { renderHomePage } from '../pages/home.js';
-import { renderLoginPage } from '../pages/login.js';
-import { renderSignupPage } from '../pages/signup.js';
-import { renderAboutPage } from '../pages/about.js';
-import { renderDashboardPage } from '../pages/dashboard.js';
+// Import page rendering functions - CORRECTED PATHS
+import { renderHomePage } from './pages/home.js';
+import { renderLoginPage } from './pages/login.js';
+import { renderSignupPage } from './pages/signup.js';
+import { renderAboutPage } from './pages/about.js';
+import { renderDashboardPage } from './pages/dashboard.js';
 
 
 /**
