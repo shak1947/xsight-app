@@ -1,123 +1,169 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Xsight - AI Query Builder</title>
     
-    <!-- Google Fonts: Inter (CRITICAL FOR THE DESIGN) -->
+    <!-- Tailwind CSS for modern, utility-first styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Font Awesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <!-- The ONE Consolidated Stylesheet -->
-    <link rel="stylesheet" href="public/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <style>
+        /* Apply the Inter font family defined in the Google Fonts link */
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        /* Style for the mobile menu toggle animation */
+        .nav-toggle span {
+            transition: all 0.3s ease-in-out;
+        }
+        .nav-toggle.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+        .nav-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+        .nav-toggle.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -5px);
+        }
+    </style>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-800">
+
     <!-- Loading Screen -->
-    <div id="loading-screen" class="loading-screen">
-        <div class="spinner"></div>
-        <p>Loading Xsight...</p>
+    <div id="loading-screen" class="fixed inset-0 bg-gradient-to-br from-blue-600 to-indigo-800 flex flex-col justify-center items-center z-50 text-white transition-opacity duration-300">
+        <div class="w-12 h-12 border-4 border-white/50 border-t-white rounded-full animate-spin"></div>
+        <p class="mt-4 text-lg font-medium">Loading Xsight...</p>
     </div>
 
     <!-- Navigation Bar -->
-    <nav id="navbar" class="navbar">
-        <div class="nav-container container">
-            <div class="nav-brand">
-                <i class="fas fa-search-plus"></i>
-                <span>Xsight</span>
-            </div>
-            <div class="nav-menu" id="nav-menu">
-                <a href="#" class="nav-link active" data-page="home">Home</a>
-                <a href="#" class="nav-link" data-page="about">About</a>
-                <a href="#" class="nav-link" data-page="dashboard" id="dashboard-link" style="display: none;">Dashboard</a>
-                <div class="nav-auth" id="nav-auth">
-                    <a href="#" class="nav-link" data-page="login">Login</a>
-                    <a href="#" class="btn btn-primary" data-page="signup">Sign Up</a>
+    <nav id="navbar" class="bg-white/80 backdrop-blur-lg sticky top-0 z-40 border-b border-slate-200">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center h-20">
+                <!-- Brand Logo -->
+                <a href="#" data-page="home" class="flex items-center space-x-2 text-2xl font-bold text-blue-600">
+                    <i class="fas fa-search-plus"></i>
+                    <span>Xsight</span>
+                </a>
+
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-2">
+                    <a href="#" class="nav-link text-slate-600 hover:bg-slate-100 hover:text-blue-600 px-4 py-2 rounded-lg font-medium transition-colors" data-page="home">Home</a>
+                    <a href="#" class="nav-link text-slate-600 hover:bg-slate-100 hover:text-blue-600 px-4 py-2 rounded-lg font-medium transition-colors" data-page="about">About</a>
+                    <a href="#" class="nav-link text-slate-600 hover:bg-slate-100 hover:text-blue-600 px-4 py-2 rounded-lg font-medium transition-colors" data-page="dashboard" id="dashboard-link" style="display: none;">Dashboard</a>
+                    <div id="nav-auth" class="flex items-center space-x-2 pl-4">
+                        <a href="#" class="text-slate-600 hover:text-blue-600 font-medium transition-colors" data-page="login">Login</a>
+                        <a href="#" class="bg-blue-600 text-white px-5 py-2 rounded-lg font-semibold hover:bg-blue-700 shadow-sm hover:shadow-md transition-all" data-page="signup">Sign Up</a>
+                    </div>
+                    <div id="nav-user" class="hidden items-center space-x-4 pl-4">
+                        <span class="user-name font-medium text-slate-700" id="user-name"></span>
+                        <button class="logout-btn text-slate-500 hover:text-red-600 transition-colors" id="logout-btn" title="Logout">
+                            <i class="fas fa-sign-out-alt text-xl"></i>
+                        </button>
+                    </div>
                 </div>
-                <div class="nav-user" id="nav-user" style="display: none;">
-                    <span class="user-name" id="user-name"></span>
-                    <button class="logout-btn" id="logout-btn">Logout</button>
+
+                <!-- Mobile Menu Toggle -->
+                <div class="md:hidden">
+                    <button class="nav-toggle" id="nav-toggle" aria-label="Open navigation menu">
+                        <span class="block w-6 h-0.5 bg-slate-800"></span>
+                        <span class="block w-6 h-0.5 bg-slate-800 mt-1.5"></span>
+                        <span class="block w-6 h-0.5 bg-slate-800 mt-1.5"></span>
+                    </button>
                 </div>
             </div>
-            <button class="nav-toggle" id="nav-toggle" aria-label="Open navigation menu">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div class="hidden md:hidden" id="nav-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-slate-200">
+                <a href="#" class="nav-link block text-slate-600 hover:bg-slate-100 hover:text-blue-600 px-4 py-3 rounded-lg font-medium transition-colors" data-page="home">Home</a>
+                <a href="#" class="nav-link block text-slate-600 hover:bg-slate-100 hover:text-blue-600 px-4 py-3 rounded-lg font-medium transition-colors" data-page="about">About</a>
+                <a href="#" class="nav-link block text-slate-600 hover:bg-slate-100 hover:text-blue-600 px-4 py-3 rounded-lg font-medium transition-colors" data-page="dashboard" id="mobile-dashboard-link" style="display: none;">Dashboard</a>
+                <div class="border-t border-slate-200 mt-4 pt-4 space-y-3">
+                    <div id="mobile-nav-auth">
+                         <a href="#" class="block text-center bg-blue-600 text-white px-5 py-3 rounded-lg font-semibold hover:bg-blue-700 w-full" data-page="signup">Sign Up</a>
+                         <a href="#" class="block text-center text-slate-600 hover:text-blue-600 font-medium mt-3" data-page="login">Login</a>
+                    </div>
+                    <div id="mobile-nav-user" class="hidden flex justify-between items-center px-4">
+                         <span class="user-name-mobile font-medium text-slate-700"></span>
+                         <button class="logout-btn-mobile text-slate-500 hover:text-red-600 transition-colors" title="Logout">Logout</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </nav>
 
     <!-- Main App Container where pages are injected by JS -->
-    <main id="app" class="app-container"></main>
+    <main id="app" class="app-container">
+        <!-- Dynamic content will be injected here by router.js -->
+    </main>
 
     <!-- Footer -->
-    <footer id="footer" class="footer">
-        <div class="footer-container container">
-            <div class="footer-content">
-                 <div class="footer-section">
-                    <h4>Xsight</h4>
-                    <p>Intelligent AI Query Builder for the modern era.</p>
-                    <div class="social-links">
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-linkedin"></i></a>
-                        <a href="#"><i class="fab fa-github"></i></a>
+    <footer id="footer" class="bg-slate-800 text-slate-400">
+        <div class="container mx-auto px-4 py-12">
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
+                <div class="col-span-2 lg:col-span-1">
+                    <h4 class="text-white text-lg font-semibold">Xsight</h4>
+                    <p class="mt-2 text-sm">Intelligent AI Query Builder for the modern era.</p>
+                    <div class="flex space-x-4 mt-4">
+                        <a href="#" class="hover:text-white"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="hover:text-white"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" class="hover:text-white"><i class="fab fa-github"></i></a>
                     </div>
                 </div>
-                <div class="footer-section">
-                    <h4>Product</h4>
-                    <ul>
-                        <li><a href="#" data-page="home">Features</a></li>
-                        <li><a href="#" data-page="about">About</a></li>
-                        <li><a href="#">Pricing</a></li>
-                        <li><a href="#">API</a></li>
+                <div>
+                    <h5 class="text-white font-semibold tracking-wider uppercase">Product</h5>
+                    <ul class="mt-4 space-y-2 text-sm">
+                        <li><a href="#" data-page="home" class="hover:text-white">Features</a></li>
+                        <li><a href="#" data-page="about" class="hover:text-white">About</a></li>
+                        <li><a href="#" class="hover:text-white">Pricing</a></li>
+                        <li><a href="#" class="hover:text-white">API</a></li>
                     </ul>
                 </div>
-                <div class="footer-section">
-                    <h4>Support</h4>
-                    <ul>
-                        <li><a href="#">Documentation</a></li>
-                        <li><a href="#">Help Center</a></li>
-                        <li><a href="#">Contact</a></li>
-                        <li><a href="#">Status</a></li>
+                <div>
+                    <h5 class="text-white font-semibold tracking-wider uppercase">Support</h5>
+                    <ul class="mt-4 space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-white">Documentation</a></li>
+                        <li><a href="#" class="hover:text-white">Help Center</a></li>
+                        <li><a href="#" class="hover:text-white">Contact</a></li>
+                        <li><a href="#" class="hover:text-white">Status</a></li>
                     </ul>
                 </div>
-                <div class="footer-section">
-                    <h4>Legal</h4>
-                    <ul>
-                        <li><a href="#">Privacy</a></li>
-                        <li><a href="#">Terms</a></li>
-                        <li><a href="#">Cookies</a></li>
-                        <li><a href="#">License</a></li>
+                <div>
+                    <h5 class="text-white font-semibold tracking-wider uppercase">Legal</h5>
+                    <ul class="mt-4 space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-white">Privacy</a></li>
+                        <li><a href="#" class="hover:text-white">Terms</a></li>
+                        <li><a href="#" class="hover:text-white">Cookies</a></li>
                     </ul>
                 </div>
             </div>
-            <div class="footer-bottom">
+            <div class="mt-12 border-t border-slate-700 pt-8 text-center text-sm">
                 <p>&copy; 2025 Xsight. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
-    <!-- Firebase SDK - This should be your single config file -->
+    <!-- All JavaScript modules are loaded here -->
     <script type="module" src="public/js/config/firebase-config.js"></script>
-    
-    <!-- App Modules -->
     <script type="module" src="public/js/modules/auth.js"></script>
     <script type="module" src="public/js/modules/router.js"></script>
-    <!-- Add other managers as needed, e.g., projects.js -->
-
-    <!-- Page-specific JS -->
     <script type="module" src="public/js/pages/home.js"></script>
     <script type="module" src="public/js/pages/login.js"></script>
     <script type="module" src="public/js/pages/signup.js"></script>
     <script type="module" src="public/js/pages/about.js"></script>
     <script type="module" src="public/js/pages/dashboard.js"></script>
-    
-    <!-- Main App Entry Point -->
     <script type="module" src="public/js/app.js"></script>
 </body>
 </html>
