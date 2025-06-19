@@ -327,7 +327,4 @@ async function loadProjects() {
     }
 }
 
-// Register the route
-if (window.router) {
-    window.router.addRoute('dashboard', renderDashboardPage);
-}
+
