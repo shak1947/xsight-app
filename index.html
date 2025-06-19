@@ -4,11 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Xsight - AI Query Builder</title>
-    <!-- Updated paths to point to public directory -->
+    
+    <!-- Google Fonts: Inter (CRITICAL FOR THE DESIGN) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- The ONE Consolidated Stylesheet -->
     <link rel="stylesheet" href="public/css/main.css">
 
-  
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
     <!-- Loading Screen -->
@@ -19,42 +26,40 @@
 
     <!-- Navigation Bar -->
     <nav id="navbar" class="navbar">
-        <div class="nav-container">
+        <div class="nav-container container">
             <div class="nav-brand">
                 <i class="fas fa-search-plus"></i>
                 <span>Xsight</span>
             </div>
             <div class="nav-menu" id="nav-menu">
-                <a href="#" class="nav-link" data-page="home">Home</a>
+                <a href="#" class="nav-link active" data-page="home">Home</a>
                 <a href="#" class="nav-link" data-page="about">About</a>
                 <a href="#" class="nav-link" data-page="dashboard" id="dashboard-link" style="display: none;">Dashboard</a>
                 <div class="nav-auth" id="nav-auth">
                     <a href="#" class="nav-link" data-page="login">Login</a>
-                    <a href="#" class="nav-link btn-primary" data-page="signup">Sign Up</a>
+                    <a href="#" class="btn btn-primary" data-page="signup">Sign Up</a>
                 </div>
                 <div class="nav-user" id="nav-user" style="display: none;">
                     <span class="user-name" id="user-name"></span>
                     <button class="logout-btn" id="logout-btn">Logout</button>
                 </div>
             </div>
-            <div class="nav-toggle" id="nav-toggle">
+            <button class="nav-toggle" id="nav-toggle" aria-label="Open navigation menu">
                 <span></span>
                 <span></span>
                 <span></span>
-            </div>
+            </button>
         </div>
     </nav>
 
-    <!-- Main App Container -->
-    <div id="app" class="app-container">
-        <!-- Dynamic content will be injected here -->
-    </div>
+    <!-- Main App Container where pages are injected by JS -->
+    <main id="app" class="app-container"></main>
 
     <!-- Footer -->
     <footer id="footer" class="footer">
-        <div class="footer-container">
+        <div class="footer-container container">
             <div class="footer-content">
-                <div class="footer-section">
+                 <div class="footer-section">
                     <h4>Xsight</h4>
                     <p>Intelligent AI Query Builder for the modern era.</p>
                     <div class="social-links">
@@ -97,25 +102,22 @@
         </div>
     </footer>
 
-    <!-- Firebase SDK -->
+    <!-- Firebase SDK - This should be your single config file -->
     <script type="module" src="public/js/config/firebase-config.js"></script>
     
-    <!-- Your Existing Modules (in correct order) -->
-    <script type="module" src="public/js/modules/router.js"></script>
+    <!-- App Modules -->
     <script type="module" src="public/js/modules/auth.js"></script>
-    <script type="module" src="public/js/modules/projects.js"></script>
-    <script type="module" src="public/js/modules/agents.js"></script>
-    <script type="module" src="public/js/modules/ui.js"></script>
-    <script type="module" src="public/js/modules/fileUpload.js"></script>
-    <script type="module" src="public/js/pages/dashboard.js"></script>
-    
-    <!-- New Page Components -->
+    <script type="module" src="public/js/modules/router.js"></script>
+    <!-- Add other managers as needed, e.g., projects.js -->
+
+    <!-- Page-specific JS -->
     <script type="module" src="public/js/pages/home.js"></script>
     <script type="module" src="public/js/pages/login.js"></script>
     <script type="module" src="public/js/pages/signup.js"></script>
     <script type="module" src="public/js/pages/about.js"></script>
+    <script type="module" src="public/js/pages/dashboard.js"></script>
     
-    <!-- Main App Entry Point (Your Updated app.js) -->
+    <!-- Main App Entry Point -->
     <script type="module" src="public/js/app.js"></script>
 </body>
 </html>
