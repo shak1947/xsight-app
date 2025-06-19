@@ -512,5 +512,3 @@ function updateAuthUI(user) {
     if (userName) userName.textContent = user.displayName || user.email;
 }
 
-// Register the route
-window.router.addRoute('signup', renderSignupPage);
