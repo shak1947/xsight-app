@@ -806,3 +806,25 @@ section {
     text-align: center;
   }
 }
+
+.hero-stats {
+  display: flex;
+  gap: var(--spacing-2xl);
+  margin-top: var(--spacing-xl);
+}
+
+.stat {
+  text-align: center;
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: white;
+}
+
+.stat-label {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.875rem;
+}
+
