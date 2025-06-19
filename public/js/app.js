@@ -113,7 +113,7 @@
             
             // Test JavaScript modules
             await testResource('public/js/app.js', 'module');
-            await testResource('public/js/config/firebase-config.js', 'module');
+            await testResource('public/js/config/firebase.js', 'module');
             await testResource('public/js/modules/router.js', 'module');
             await testResource('public/js/modules/auth.js', 'module');
             await testResource('public/js/modules/projects.js', 'module');
