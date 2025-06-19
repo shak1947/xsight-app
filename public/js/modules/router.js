@@ -1,5 +1,5 @@
-// Router Module - handles client-side routing
-class Router {
+// Simple Router for Integration with Existing App
+class SimpleRouter {
     constructor() {
         this.routes = new Map();
         this.currentPage = null;
@@ -23,9 +23,13 @@ class Router {
             }
         });
 
-        // Load initial page
+        // Load initial page based on current location
         const initialPage = this.getPageFromURL() || 'home';
-        this.navigateTo(initialPage, false);
+        
+        // Small delay to let the main app initialize first
+        setTimeout(() => {
+            this.navigateTo(initialPage, false);
+        }, 100);
     }
 
     // Register a route with its render function
@@ -48,8 +52,10 @@ class Router {
         // Update active navigation
         this.updateActiveNavigation(page);
 
-        // Show loading
-        this.showLoading();
+        // Show loading for non-dashboard pages
+        if (page !== 'dashboard') {
+            this.showLoading();
+        }
 
         try {
             // Get the render function for this page
@@ -103,7 +109,7 @@ class Router {
         document.title = titles[page] || 'Xsight';
     }
 
-    // Show loading screen
+    // Show loading screen (only for navigation pages, not dashboard)
     showLoading() {
         const loadingScreen = document.getElementById('loading-screen');
         if (loadingScreen) {
@@ -122,18 +128,20 @@ class Router {
     // Show error message
     showError(message) {
         const appContainer = document.getElementById('app');
-        appContainer.innerHTML = `
-            <div class="error-container">
-                <div class="error-message">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <h2>Oops! Something went wrong</h2>
-                    <p>${message}</p>
-                    <button onclick="window.router.navigateTo('home')" class="btn btn-primary">
-                        Go Home
-                    </button>
+        if (appContainer) {
+            appContainer.innerHTML = `
+                <div class="error-container">
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h2>Oops! Something went wrong</h2>
+                        <p>${message}</p>
+                        <button onclick="window.router.navigateTo('home')" class="btn btn-primary">
+                            Go Home
+                        </button>
+                    </div>
                 </div>
-            </div>
-        `;
+            `;
+        }
     }
 
     // Get current page
@@ -143,6 +151,6 @@ class Router {
 }
 
 // Create global router instance
-window.router = new Router();
+window.router = new SimpleRouter();
 
-export default Router;
+export default SimpleRouter;
