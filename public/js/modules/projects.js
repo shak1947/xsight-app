@@ -1,5 +1,5 @@
 // Projects Management Module
-import { db, collection, query, onSnapshot, addDoc, doc, deleteDoc } from '../config/firebase.js';
+import { db, collection, query, onSnapshot, addDoc, doc, deleteDoc } from '../config/firebase-config.js';
 import { getPrivateBasePath, showMessage, findById } from '../utils/helpers.js';
 
 export class ProjectsManager {
