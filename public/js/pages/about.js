@@ -1,4 +1,4 @@
-<!-- About Page HTML Structure -->
+<!-- About Page HTML Structure  -->
 <div class="page">
   <div class="container">
     <!-- Intro Section -->
