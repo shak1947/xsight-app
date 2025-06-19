@@ -1,156 +1,102 @@
-// Simple Router for Integration with Existing App
-class SimpleRouter {
-    constructor() {
-        this.routes = new Map();
+/**
+ * A simple, robust client-side router for a single-page application (SPA).
+ * It uses the URL hash (#) for routing, which is reliable for static hosting.
+ * This version is designed to be controlled by a main application script (app.js).
+ */
+export class Router {
+    /**
+     * Creates a new Router instance.
+     * @param {HTMLElement} appContainer - The main element where page content will be rendered.
+     */
+    constructor(appContainer) {
+        // The router needs to know where to render the content.
+        if (!appContainer) {
+            throw new Error("Router constructor requires a valid app container element.");
+        }
+        this.appContainer = appContainer;
+        this.routes = new Map(); // Stores the registered routes (e.g., 'home' -> renderHomePage)
         this.currentPage = null;
-        this.init();
     }
 
-    init() {
-        // Handle browser back/forward buttons
-        window.addEventListener('popstate', (e) => {
-            const page = e.state?.page || 'home';
-            this.navigateTo(page, false);
-        });
-
-        // Handle navigation clicks
-        document.addEventListener('click', (e) => {
-            const link = e.target.closest('[data-page]');
-            if (link) {
-                e.preventDefault();
-                const page = link.getAttribute('data-page');
-                this.navigateTo(page);
-            }
-        });
-
-        // Load initial page based on current location
-        const initialPage = this.getPageFromURL() || 'home';
-        
-        // Small delay to let the main app initialize first
-        setTimeout(() => {
-            this.navigateTo(initialPage, false);
-        }, 100);
-    }
-
-    // Register a route with its render function
+    /**
+     * Registers a route and its corresponding render function.
+     * This is called by app.js to teach the router about available pages.
+     * @param {string} path - The route path (e.g., 'home', 'about').
+     * @param {Function} renderFunction - The function to call to render the page.
+     */
     addRoute(path, renderFunction) {
         this.routes.set(path, renderFunction);
     }
 
-    // Navigate to a specific page
-    async navigateTo(page, pushState = true) {
+    /**
+     * Reads the route from the URL hash and calls the appropriate render function.
+     * This is the central method that handles page rendering.
+     */
+    handleLocation() {
+        // Get the page name from the URL hash (e.g., #home -> 'home')
+        const page = window.location.hash.substring(1) || 'home';
+
+        // Check if the route is one we know about.
         if (!this.routes.has(page)) {
-            console.warn(`Route '${page}' not found. Redirecting to home.`);
-            page = 'home';
-        }
-
-        // Update browser history
-        if (pushState) {
-            history.pushState({ page }, '', `#${page}`);
-        }
-
-        // Update active navigation
-        this.updateActiveNavigation(page);
-
-        // Show loading for non-dashboard pages
-        if (page !== 'dashboard') {
-            this.showLoading();
+            console.error(`Route '${page}' not found. Showing error page.`);
+            this.renderErrorPage('Page not found.');
+            return;
         }
 
         try {
-            // Get the render function for this page
-            const renderFunction = this.routes.get(page);
-            
-            // Render the page
-            await renderFunction();
-            
+            console.log(`Navigating to page: ${page}`);
             this.currentPage = page;
             
-            // Update page title
-            this.updatePageTitle(page);
+            // Get the function associated with this page.
+            const renderFunction = this.routes.get(page);
             
+            // Execute the render function (e.g., renderHomePage()).
+            // The function itself is responsible for updating the appContainer's innerHTML.
+            renderFunction();
+            
+            // Update which nav link looks "active".
+            this.updateActiveNavLink(page);
+
         } catch (error) {
-            console.error('Error rendering page:', error);
-            this.showError('Failed to load page');
-        } finally {
-            this.hideLoading();
+            console.error(`Error rendering page '${page}':`, error);
+            this.renderErrorPage('Failed to load page. Check the console for details.');
         }
     }
 
-    // Get current page from URL hash
-    getPageFromURL() {
-        const hash = window.location.hash.substring(1);
-        return hash || 'home';
+    /**
+     * Renders a generic error message into the app container.
+     * @param {string} message - The error message to display.
+     */
+    renderErrorPage(message) {
+        this.appContainer.innerHTML = `
+            <div class="text-center p-8">
+                <h2 class="text-2xl font-bold text-red-600 mb-4">Oops! Something went wrong</h2>
+                <p class="text-slate-700">${message}</p>
+                <a href="#home" class="mt-6 inline-block bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700">Go Home</a>
+            </div>
+        `;
     }
 
-    // Update active navigation links
-    updateActiveNavigation(page) {
-        // Remove active class from all nav links
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.classList.remove('active');
+    /**
+     * Updates the active class on navigation links to provide visual feedback.
+     * @param {string} page - The currently active page.
+     */
+    updateActiveNavLink(page) {
+        // This query finds all links that have a `data-page` attribute.
+        document.querySelectorAll('[data-page]').forEach(link => {
+            if (link.dataset.page === page) {
+                link.classList.add('active'); // You can style '.active' in your CSS
+            } else {
+                link.classList.remove('active');
+            }
         });
-
-        // Add active class to current page link
-        const activeLink = document.querySelector(`[data-page="${page}"]`);
-        if (activeLink) {
-            activeLink.classList.add('active');
-        }
     }
 
-    // Update page title
-    updatePageTitle(page) {
-        const titles = {
-            home: 'Xsight - AI Query Builder',
-            about: 'About Us - Xsight',
-            login: 'Login - Xsight',
-            signup: 'Sign Up - Xsight',
-            dashboard: 'Dashboard - Xsight'
-        };
-        document.title = titles[page] || 'Xsight';
-    }
-
-    // Show loading screen (only for navigation pages, not dashboard)
-    showLoading() {
-        const loadingScreen = document.getElementById('loading-screen');
-        if (loadingScreen) {
-            loadingScreen.style.display = 'flex';
-        }
-    }
-
-    // Hide loading screen
-    hideLoading() {
-        const loadingScreen = document.getElementById('loading-screen');
-        if (loadingScreen) {
-            loadingScreen.style.display = 'none';
-        }
-    }
-
-    // Show error message
-    showError(message) {
-        const appContainer = document.getElementById('app');
-        if (appContainer) {
-            appContainer.innerHTML = `
-                <div class="error-container">
-                    <div class="error-message">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <h2>Oops! Something went wrong</h2>
-                        <p>${message}</p>
-                        <button onclick="window.router.navigateTo('home')" class="btn btn-primary">
-                            Go Home
-                        </button>
-                    </div>
-                </div>
-            `;
-        }
-    }
-
-    // Get current page
+    /**
+     * Returns the name of the current page.
+     * @returns {string|null}
+     */
     getCurrentPage() {
         return this.currentPage;
     }
 }
-
-// Create global router instance
-window.router = new SimpleRouter();
-
-export default SimpleRouter;
