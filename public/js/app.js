@@ -1,159 +1,74 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xsight - AI Query Builder</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .status {
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 4px;
-        }
-        .success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        .error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        .loading {
-            background: #cce5ff;
-            color: #004085;
-            border: 1px solid #b8daff;
-        }
-        pre {
-            background: #f8f9fa;
-            padding: 10px;
-            border-radius: 4px;
-            overflow-x: auto;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Xsight App - Deployment Test</h1>
-        <p>This page tests if all resources are loading correctly on GitHub Pages.</p>
+/**
+ * Main application entry point for Xsight.
+ * This script initializes all the application modules in the correct order
+ * after the HTML document has fully loaded.
+ */
+
+// Import all necessary modules and page renderers
+import { AuthManager } from './modules/auth.js';
+import { Router } from './modules/router.js';
+import { UIManager } from './modules/ui.js';
+// Import page rendering functions
+import { renderHomePage } from '../pages/home.js';
+import { renderLoginPage } from '../pages/login.js';
+import { renderSignupPage } from '../pages/signup.js';
+import { renderAboutPage } from '../pages/about.js';
+import { renderDashboardPage } from '../pages/dashboard.js';
+
+
+/**
+ * The main function that runs once the DOM is ready.
+ * It sets up the entire application.
+ */
+function initializeApp() {
+    console.log("🚀 DOM content loaded. Initializing Xsight App...");
+
+    // 1. Initialize core managers
+    const authManager = new AuthManager();
+    const uiManager = new UIManager();
+    
+    // Make managers globally accessible for easier debugging if needed
+    window.authManager = authManager;
+    window.uiManager = uiManager;
+
+    // 2. Initialize the router and register all the page routes
+    const router = new Router(document.getElementById('app'));
+    router.addRoute('home', renderHomePage);
+    router.addRoute('login', renderLoginPage);
+    router.addRoute('signup', renderSignupPage);
+    router.addRoute('about', renderAboutPage);
+    router.addRoute('dashboard', renderDashboardPage);
+    
+    // Make router globally accessible
+    window.router = router;
+    console.log("📍 Routes registered.");
+
+    // 3. Set up listeners and initial state
+    // Listen for auth state changes to update the UI (e.g., show/hide login/logout buttons)
+    authManager.onAuthStateChange(user => {
+        uiManager.updateAuthUI(user);
         
-        <div id="test-results">
-            <div class="status loading">Testing deployment...</div>
-        </div>
-
-        <h2>Manual Tests:</h2>
-        <div id="manual-tests"></div>
-
-        <h2>Console Output:</h2>
-        <pre id="console-output"></pre>
-    </div>
-
-    <script>
-        const results = document.getElementById('test-results');
-        const manualTests = document.getElementById('manual-tests');
-        const consoleOutput = document.getElementById('console-output');
-        let logs = [];
-
-        // Override console.log to capture output
-        const originalLog = console.log;
-        console.log = function(...args) {
-            originalLog.apply(console, args);
-            logs.push(args.join(' '));
-            consoleOutput.textContent = logs.join('\n');
-        };
-
-        // Test function
-        async function testResource(url, type = 'text') {
-            const testDiv = document.createElement('div');
-            testDiv.className = 'status loading';
-            testDiv.textContent = `Testing: ${url}`;
-            results.appendChild(testDiv);
-
-            try {
-                const response = await fetch(url);
-                if (response.ok) {
-                    testDiv.className = 'status success';
-                    testDiv.textContent = `✓ ${url} - Status: ${response.status}`;
-                    if (type === 'module') {
-                        testDiv.textContent += ' (Module exists)';
-                    }
-                } else {
-                    testDiv.className = 'status error';
-                    testDiv.textContent = `✗ ${url} - Status: ${response.status}`;
-                }
-            } catch (error) {
-                testDiv.className = 'status error';
-                testDiv.textContent = `✗ ${url} - Error: ${error.message}`;
-            }
+        // If the user logs out while on a protected page, redirect them home
+        const currentPage = router.getCurrentPage();
+        if (!user && currentPage === 'dashboard') {
+            router.navigateTo('home');
         }
+    });
 
-        // Run tests
-        async function runTests() {
-            console.log('Starting deployment tests...');
-            
-            // Test CSS files
-            await testResource('public/css/main.css');
-            await testResource('public/css/components.css');
-            await testResource('public/css/responsive.css');
-            
-            // Test JavaScript modules
-            await testResource('public/js/app.js', 'module');
-            await testResource('public/js/config/firebase-config.js', 'module');
-            await testResource('public/js/modules/router.js', 'module');
-            await testResource('public/js/modules/auth.js', 'module');
-            await testResource('public/js/modules/projects.js', 'module');
-            await testResource('public/js/modules/agents.js', 'module');
-            await testResource('public/js/modules/ui.js', 'module');
-            await testResource('public/js/modules/fileUpload.js', 'module');
-            
-            // Test page modules
-            await testResource('public/js/pages/home.js', 'module');
-            await testResource('public/js/pages/login.js', 'module');
-            await testResource('public/js/pages/signup.js', 'module');
-            await testResource('public/js/pages/about.js', 'module');
+    // Handle initial page load by checking the URL hash
+    router.handleLocation();
 
-            // Manual load test
-            manualTests.innerHTML = `
-                <button onclick="loadApp()">Try Loading Full App</button>
-                <button onclick="window.location.href='index.html'">Go to Main App</button>
-            `;
+    // Set up listeners for all navigation links
+    uiManager.setupNavigationEvents();
+    
+    // Hide the initial loading screen
+    uiManager.hideLoadingScreen();
 
-            console.log('Tests completed!');
-        }
+    console.log("✅ Xsight Application initialized successfully!");
+}
 
-        // Function to load the full app
-        window.loadApp = async function() {
-            try {
-                const script = document.createElement('script');
-                script.type = 'module';
-                script.textContent = `
-                    import XsightApp from './public/js/app.js';
-                    console.log('App module loaded successfully!');
-                    window.XsightApp = XsightApp;
-                `;
-                document.body.appendChild(script);
-            } catch (error) {
-                console.error('Failed to load app:', error);
-            }
-        };
-
-        // Run tests when page loads
-        runTests();
-    </script>
-</body>
-</html>
+// This is the crucial part:
+// We add an event listener that waits for the 'DOMContentLoaded' event.
+// This ensures that the HTML page is fully built before we try to run any scripts
+// that interact with it. This is the standard, reliable way to start a web app.
+window.addEventListener('DOMContentLoaded', initializeApp);
