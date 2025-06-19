@@ -1,5 +1,5 @@
 // Authentication Module
-import { auth, onAuthStateChanged, signOut } from '../config/firebase.js';
+import { auth, onAuthStateChanged, signOut } from '../config/firebase-config.js';
 import { showElement, hideElement, showMessage } from '../utils/helpers.js';
 
 export class AuthManager {
