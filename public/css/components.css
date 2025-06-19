@@ -1,254 +1,109 @@
-/* ======================================== /
-/ Component-specific CSS styles            /
-/ ======================================== */
-
-/* Keep all your existing styles for the landing page, auth, etc. /
-/ ... (Hero, Features, Auth, Footer styles are here) ... */
-
-/* Hero Section */
-.hero {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: var(--spacing-3xl) 0;
-  min-height: 80vh;
-  display: flex;
-  align-items: center;
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  border-radius: var(--border-radius);
+  padding: 0.75rem 1.25rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  text-decoration: none;
 }
 
-/* ... (Keep all other non-dashboard styles as they are) ... /
-/ ... /
-/ ... */
-
-.auth-visual {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.btn i {
+  margin-left: 0.5rem;
 }
 
-/* =================================================================== /
-/         NEW & IMPROVED DASHBOARD STYLES (REPLACES OLD ONES)       /
-/ =================================================================== */
-
-/* Main container for the entire dashboard page /
-.dashboard {
-padding: 2rem;
-background-color: #f8fafc; / A very light, clean gray background for the page /
-min-height: calc(100vh - 80px); / Adjust '80px' based on your main nav bar height */
+/* Primary */
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
 }
 
-/* Header section with Welcome message and buttons /
-.dashboard-header {
-display: flex;
-justify-content: space-between;
-align-items: center;
-margin-bottom: 2rem;
-padding-bottom: 1.5rem;
-border-bottom: 1px solid #e2e8f0; / Subtle separator line */
+.btn-primary:hover {
+  background-color: #4338ca;
 }
 
-.dashboard-header h1 {
-font-size: 2rem;
-font-weight: 700;
-color: #1e293b; /* Dark slate color for text */
-margin: 0;
+/* Outline */
+.btn-outline {
+  background-color: transparent;
+  color: var(--primary-color);
+  border: 2px solid var(--primary-color);
 }
 
-.dashboard-subtitle {
-font-size: 1.1rem;
-color: #64748b; /* Lighter gray for the subtitle */
-margin-top: 0.25rem;
+.btn-outline:hover {
+  background-color: var(--primary-color);
+  color: white;
 }
 
-.dashboard-actions {
-display: flex;
-gap: 1rem;
+/* Outline White (for dark backgrounds) */
+.btn-outline-white {
+  border: 2px solid white;
+  color: white;
+  background: transparent;
 }
 
-/* The Core Layout Logic using CSS Grid /
-.dashboard-layout {
-display: grid;
-/ Create three columns: 1fr means "1 fraction of the available space" /
-/ The third column is slightly wider (1.5fr) /
-grid-template-columns: 1fr 1fr 1.5fr;
-gap: 2rem; / The space between the grid columns and rows */
+.btn-outline-white:hover {
+  background: white;
+  color: var(--primary-color);
 }
 
-/* General Styling for each panel (Projects, Agents, etc.) /
-.projects-section,
-.agents-section,
-.agent-details-section {
-background-color: #ffffff;
-border-radius: 12px;
-padding: 1.5rem;
-box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-display: flex;
-flex-direction: column; / Stack the header and list inside the panel */
+/* Forms */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea,
+select {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: var(--border-radius);
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  transition: border-color 0.2s;
 }
 
-.section-header {
-display: flex;
-justify-content: space-between;
-align-items: center;
-padding-bottom: 1rem;
-border-bottom: 1px solid #e2e8f0;
-margin-bottom: 1rem;
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--primary-color);
+  outline: none;
 }
 
-.section-header h2 {
-font-size: 1.25rem;
-font-weight: 600;
-color: #334155;
-margin: 0;
-display: flex;
-align-items: center;
-gap: 0.75rem; /* Space between icon and text */
+/* Cards */
+.card {
+  background-color: white;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
 }
 
-/* Styling for the lists that will hold project/agent cards /
-.projects-list, .agents-list, .agent-details {
-flex-grow: 1; / Allows the list to fill the available space in the panel */
-display: flex;
-flex-direction: column;
-gap: 1rem;
+/* Page Layout Containers */
+.page {
+  padding: var(--spacing-3xl) var(--spacing-md);
+  min-height: calc(100vh - 200px); /* leave space for nav and footer */
 }
 
-/* Styling for individual project cards that will appear in the list */
-.project-card {
-border: 1px solid #e2e8f0;
-padding: 1rem;
-border-radius: 8px;
-background-color: #f8fafc;
-transition: box-shadow 0.2s, border-color 0.2s;
+/* Typography */
+h1, h2, h3, h4 {
+  font-weight: 700;
+  color: var(--gray-900);
 }
 
-.project-card:hover {
-border-color: #3b82f6; /* Highlight on hover */
-box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+p {
+  color: #4b5563;
 }
 
-.project-card h4 {
-margin: 0 0 0.5rem 0;
-font-size: 1.1rem;
+/* Utility */
+.text-center {
+  text-align: center;
 }
 
-.project-card p {
-margin: 0 0 1rem 0;
-font-size: 0.9rem;
-color: #64748b;
+.mt-lg {
+  margin-top: var(--spacing-xl);
 }
 
-/* Styling for the "empty" or "loading" states /
-.empty-state, .loading-spinner {
-display: flex;
-flex-direction: column;
-justify-content: center;
-align-items: center;
-text-align: center;
-height: 100%;
-color: #94a3b8; / A muted gray color */
-flex-grow: 1;
-}
-
-.empty-state p, .loading-spinner p {
-margin-top: 1rem;
-font-size: 0.95rem;
-}
-
-/* Modal Styles (for Create Project/Agent) */
-.modal {
-position: fixed;
-z-index: 1000;
-left: 0;
-top: 0;
-width: 100%;
-height: 100%;
-overflow: auto;
-background-color: rgba(0,0,0,0.5);
-display: flex;
-justify-content: center;
-align-items: center;
-}
-
-.modal-content {
-background-color: #fefefe;
-margin: auto;
-padding: 2rem;
-border: 1px solid #888;
-border-radius: var(--border-radius-lg);
-width: 90%;
-max-width: 500px;
-box-shadow: var(--shadow-xl);
-animation: fadeIn 0.3s ease-out;
-}
-
-@keyframes fadeIn {
-from { opacity: 0; transform: scale(0.95); }
-to { opacity: 1; transform: scale(1); }
-}
-
-.modal-header {
-display: flex;
-justify-content: space-between;
-align-items: center;
-padding-bottom: 1rem;
-border-bottom: 1px solid #e2e8f0;
-margin-bottom: 1.5rem;
-}
-
-.modal-header h3 {
-margin: 0;
-font-size: 1.5rem;
-}
-
-.close-btn {
-color: #aaa;
-font-size: 28px;
-font-weight: bold;
-background: none;
-border: none;
-cursor: pointer;
-}
-
-.close-btn:hover,
-.close-btn:focus {
-color: black;
-text-decoration: none;
-}
-
-.model-selection {
-display: flex;
-flex-wrap: wrap;
-gap: 1rem;
-}
-
-/* === RESPONSIVE STYLES === /
-/ For tablets and smaller devices, adjust the layout /
-@media (max-width: 1024px) {
-.dashboard-layout {
-grid-template-columns: 1fr 1fr; / Two columns for tablets /
-}
-.agent-details-section {
-grid-column: 1 / -1; / Make the third column span the full width */
-}
-}
-
-@media (max-width: 768px) {
-.dashboard-header {
-flex-direction: column;
-align-items: flex-start;
-gap: 1rem;
-}
-.dashboard-layout {
-grid-template-columns: 1fr; /* A single column for mobile */
-}
-}
-
-/* Keep your existing responsive rules below /
-@media (max-width: 480px) {
-  .hero-title {
-    font-size: 2rem;
-  }
-  
-  .auth-form-container {
-    padding: var(--spacing-xl);
-  }
