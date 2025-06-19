@@ -1,9 +1,9 @@
-/* ======================================== */
-/* Component-specific CSS styles            */
-/* ======================================== */
+/* ======================================== /
+/ Component-specific CSS styles            /
+/ ======================================== */
 
-/* Keep all your existing styles for the landing page, auth, etc. */
-/* ... (Hero, Features, Auth, Footer styles are here) ... */
+/* Keep all your existing styles for the landing page, auth, etc. /
+/ ... (Hero, Features, Auth, Footer styles are here) ... */
 
 /* Hero Section */
 .hero {
@@ -15,9 +15,9 @@
   align-items: center;
 }
 
-/* ... (Keep all other non-dashboard styles as they are) ... */
-/* ... */
-/* ... */
+/* ... (Keep all other non-dashboard styles as they are) ... /
+/ ... /
+/ ... */
 
 .auth-visual {
   display: flex;
@@ -25,225 +25,225 @@
   align-items: center;
 }
 
-/* =================================================================== */
-/*         NEW & IMPROVED DASHBOARD STYLES (REPLACES OLD ONES)       */
-/* =================================================================== */
+/* =================================================================== /
+/         NEW & IMPROVED DASHBOARD STYLES (REPLACES OLD ONES)       /
+/ =================================================================== */
 
-/* Main container for the entire dashboard page */
+/* Main container for the entire dashboard page /
 .dashboard {
-    padding: 2rem;
-    background-color: #f8fafc; /* A very light, clean gray background for the page */
-    min-height: calc(100vh - 80px); /* Adjust '80px' based on your main nav bar height */
+padding: 2rem;
+background-color: #f8fafc; / A very light, clean gray background for the page /
+min-height: calc(100vh - 80px); / Adjust '80px' based on your main nav bar height */
 }
 
-/* Header section with Welcome message and buttons */
+/* Header section with Welcome message and buttons /
 .dashboard-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid #e2e8f0; /* Subtle separator line */
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 2rem;
+padding-bottom: 1.5rem;
+border-bottom: 1px solid #e2e8f0; / Subtle separator line */
 }
 
 .dashboard-header h1 {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #1e293b; /* Dark slate color for text */
-    margin: 0;
+font-size: 2rem;
+font-weight: 700;
+color: #1e293b; /* Dark slate color for text */
+margin: 0;
 }
 
 .dashboard-subtitle {
-    font-size: 1.1rem;
-    color: #64748b; /* Lighter gray for the subtitle */
-    margin-top: 0.25rem;
+font-size: 1.1rem;
+color: #64748b; /* Lighter gray for the subtitle */
+margin-top: 0.25rem;
 }
 
 .dashboard-actions {
-    display: flex;
-    gap: 1rem;
+display: flex;
+gap: 1rem;
 }
 
-/* The Core Layout Logic using CSS Grid */
+/* The Core Layout Logic using CSS Grid /
 .dashboard-layout {
-    display: grid;
-    /* Create three columns: 1fr means "1 fraction of the available space" */
-    /* The third column is slightly wider (1.5fr) */
-    grid-template-columns: 1fr 1fr 1.5fr;
-    gap: 2rem; /* The space between the grid columns and rows */
+display: grid;
+/ Create three columns: 1fr means "1 fraction of the available space" /
+/ The third column is slightly wider (1.5fr) /
+grid-template-columns: 1fr 1fr 1.5fr;
+gap: 2rem; / The space between the grid columns and rows */
 }
 
-/* General Styling for each panel (Projects, Agents, etc.) */
+/* General Styling for each panel (Projects, Agents, etc.) /
 .projects-section,
 .agents-section,
 .agent-details-section {
-    background-color: #ffffff;
-    border-radius: 12px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column; /* Stack the header and list inside the panel */
+background-color: #ffffff;
+border-radius: 12px;
+padding: 1.5rem;
+box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+display: flex;
+flex-direction: column; / Stack the header and list inside the panel */
 }
 
 .section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid #e2e8f0;
-    margin-bottom: 1rem;
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding-bottom: 1rem;
+border-bottom: 1px solid #e2e8f0;
+margin-bottom: 1rem;
 }
 
 .section-header h2 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #334155;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem; /* Space between icon and text */
+font-size: 1.25rem;
+font-weight: 600;
+color: #334155;
+margin: 0;
+display: flex;
+align-items: center;
+gap: 0.75rem; /* Space between icon and text */
 }
 
-/* Styling for the lists that will hold project/agent cards */
+/* Styling for the lists that will hold project/agent cards /
 .projects-list, .agents-list, .agent-details {
-    flex-grow: 1; /* Allows the list to fill the available space in the panel */
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+flex-grow: 1; / Allows the list to fill the available space in the panel */
+display: flex;
+flex-direction: column;
+gap: 1rem;
 }
 
 /* Styling for individual project cards that will appear in the list */
 .project-card {
-    border: 1px solid #e2e8f0;
-    padding: 1rem;
-    border-radius: 8px;
-    background-color: #f8fafc;
-    transition: box-shadow 0.2s, border-color 0.2s;
+border: 1px solid #e2e8f0;
+padding: 1rem;
+border-radius: 8px;
+background-color: #f8fafc;
+transition: box-shadow 0.2s, border-color 0.2s;
 }
 
 .project-card:hover {
-    border-color: #3b82f6; /* Highlight on hover */
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+border-color: #3b82f6; /* Highlight on hover */
+box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
 }
 
 .project-card h4 {
-    margin: 0 0 0.5rem 0;
-    font-size: 1.1rem;
+margin: 0 0 0.5rem 0;
+font-size: 1.1rem;
 }
 
 .project-card p {
-    margin: 0 0 1rem 0;
-    font-size: 0.9rem;
-    color: #64748b;
+margin: 0 0 1rem 0;
+font-size: 0.9rem;
+color: #64748b;
 }
 
-/* Styling for the "empty" or "loading" states */
+/* Styling for the "empty" or "loading" states /
 .empty-state, .loading-spinner {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    height: 100%;
-    color: #94a3b8; /* A muted gray color */
-    flex-grow: 1;
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+text-align: center;
+height: 100%;
+color: #94a3b8; / A muted gray color */
+flex-grow: 1;
 }
 
 .empty-state p, .loading-spinner p {
-    margin-top: 1rem;
-    font-size: 0.95rem;
+margin-top: 1rem;
+font-size: 0.95rem;
 }
 
 /* Modal Styles (for Create Project/Agent) */
 .modal {
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
+position: fixed;
+z-index: 1000;
+left: 0;
+top: 0;
+width: 100%;
+height: 100%;
+overflow: auto;
+background-color: rgba(0,0,0,0.5);
+display: flex;
+justify-content: center;
+align-items: center;
 }
 
 .modal-content {
-    background-color: #fefefe;
-    margin: auto;
-    padding: 2rem;
-    border: 1px solid #888;
-    border-radius: var(--border-radius-lg);
-    width: 90%;
-    max-width: 500px;
-    box-shadow: var(--shadow-xl);
-    animation: fadeIn 0.3s ease-out;
+background-color: #fefefe;
+margin: auto;
+padding: 2rem;
+border: 1px solid #888;
+border-radius: var(--border-radius-lg);
+width: 90%;
+max-width: 500px;
+box-shadow: var(--shadow-xl);
+animation: fadeIn 0.3s ease-out;
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
+from { opacity: 0; transform: scale(0.95); }
+to { opacity: 1; transform: scale(1); }
 }
 
 .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid #e2e8f0;
-    margin-bottom: 1.5rem;
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding-bottom: 1rem;
+border-bottom: 1px solid #e2e8f0;
+margin-bottom: 1.5rem;
 }
 
 .modal-header h3 {
-    margin: 0;
-    font-size: 1.5rem;
+margin: 0;
+font-size: 1.5rem;
 }
 
 .close-btn {
-    color: #aaa;
-    font-size: 28px;
-    font-weight: bold;
-    background: none;
-    border: none;
-    cursor: pointer;
+color: #aaa;
+font-size: 28px;
+font-weight: bold;
+background: none;
+border: none;
+cursor: pointer;
 }
 
 .close-btn:hover,
 .close-btn:focus {
-    color: black;
-    text-decoration: none;
+color: black;
+text-decoration: none;
 }
 
 .model-selection {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
+display: flex;
+flex-wrap: wrap;
+gap: 1rem;
 }
 
-/* === RESPONSIVE STYLES === */
-/* For tablets and smaller devices, adjust the layout */
+/* === RESPONSIVE STYLES === /
+/ For tablets and smaller devices, adjust the layout /
 @media (max-width: 1024px) {
-    .dashboard-layout {
-        grid-template-columns: 1fr 1fr; /* Two columns for tablets */
-    }
-    .agent-details-section {
-        grid-column: 1 / -1; /* Make the third column span the full width */
-    }
+.dashboard-layout {
+grid-template-columns: 1fr 1fr; / Two columns for tablets /
+}
+.agent-details-section {
+grid-column: 1 / -1; / Make the third column span the full width */
+}
 }
 
 @media (max-width: 768px) {
-    .dashboard-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-    }
-    .dashboard-layout {
-        grid-template-columns: 1fr; /* A single column for mobile */
-    }
+.dashboard-header {
+flex-direction: column;
+align-items: flex-start;
+gap: 1rem;
+}
+.dashboard-layout {
+grid-template-columns: 1fr; /* A single column for mobile */
+}
 }
 
-/* Keep your existing responsive rules below */
+/* Keep your existing responsive rules below /
 @media (max-width: 480px) {
   .hero-title {
     font-size: 2rem;
@@ -252,6 +252,3 @@
   .auth-form-container {
     padding: var(--spacing-xl);
   }
-  
-  /* You can add more specific overrides here if needed */
-}
