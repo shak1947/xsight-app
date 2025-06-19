@@ -1,5 +1,5 @@
 // Agents Management Module
-import { db, collection, query, onSnapshot, addDoc, doc, deleteDoc, updateDoc, getDocs } from '../config/firebase.js';
+import { db, collection, query, onSnapshot, addDoc, doc, deleteDoc, updateDoc, getDocs } from '../config/firebase-config.js';
 import { getPrivateBasePath, getPublicBasePath, showMessage, findById, clearForm } from '../utils/helpers.js';
 
 export class AgentsManager {
